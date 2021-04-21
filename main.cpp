@@ -224,7 +224,6 @@ void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client>& client
 }
 
 int main() {
-
     Graph<Node> graph;
     //distribute clients to cars
 

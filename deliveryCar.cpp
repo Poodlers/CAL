@@ -74,16 +74,15 @@ void printPowerSet(int set[], int set_size, vector<vector<int>>& providerId)
     }
 }
 
-void DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider> providers,
+bool DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider> providers,
                                       std::vector<std::vector<int>> &viableRoute){
     unordered_map<string,int> availableStock;
     Provider* currProvider;
     vector<int> possibleRoute;
     if(a.size() == 0){
-        return;
+        return false;
     }
     for( int i = 0 ; i < a.size() ; ++i ){
-
         currProvider = &providers[a[i]];
         possibleRoute.push_back(a[i]);
         for(auto& product: currProvider->getStock()){
@@ -97,13 +96,15 @@ void DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider> 
 
     if(checkIfMeetsRequirement(availableStock)){
         viableRoute.push_back(possibleRoute);
+        return true;
     };
+
+    return false;
 
 }
 
 void findPermutations(vector<int> a, vector<vector<int>>& allPerms)
 {
-
     sort(a.begin(),a.end());
 
     do {
@@ -115,21 +116,35 @@ void DeliveryCar::setClientsToDeliverTo(std::vector<int> clients) {
     this->clientsToDeliverTo = clients;
 }
 
+void DeliveryCar::checkProviderCombinations(int set_size, std::vector<std::vector<int>> &providerId,
+                                            std::vector<Provider> &providers){
+    vector<int> combination;
+    for(int i = 0; i < set_size;i++){
+        combination = {};
+        combination.push_back(i);
+        if(check_if_perm_works(combination,providers,providerId)){
+            continue;
+        }
+        if(i == set_size - 1){
+            return;
+        }
+        for(int j = i + 1; j < set_size; j++){
+            combination.push_back(j);
+            if(check_if_perm_works(combination,providers,providerId)){
+                break;
+            }
+        }
+    }
+}
+
 vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
                                               std::vector<Client> &clients, Graph<Node> &graph)  {
-    int providerlen = 0;
-    int a[1000];
-    for(int i = 0; i < providers.size();i++){
-        a[i] = i;
-        providerlen++;
-    }
+
     //fillShoppingList(clientsToDeliverTo, clients);
-    vector<vector<int>> combinations;
-    printPowerSet(a, providerlen, combinations);
     vector<vector<int>> viableRoutes;
-    for(auto& combination: combinations){
-        check_if_perm_works(combination,providers,viableRoutes);
-    }
+    checkProviderCombinations(providers.size(), viableRoutes,providers);
+
+    //esta parte do código usa powerset like a boss mas dá para faze-lo com uma sliding window technique porvavelmente
 
     //display2Dvec(viableRoutes);
 
@@ -167,7 +182,6 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
             }
             allPathsToSearch.push_back(Path);
         }
-
     }
 
     vector<Node> intermediatePaths;

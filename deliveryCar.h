@@ -26,9 +26,9 @@ public:
     bool checkIfMeetsRequirement(std::unordered_map<std::string, int>& shoppingList);
     void fillShoppingList(std::vector<int> clientIds, std::vector<Client> clients);
     std::vector<Node> getBestPossiblePath(std::vector<Provider>& providers, std::vector<Client>& clients, Graph<Node>& graph);
-    void check_if_perm_works( std::vector<int> a, std::vector<Provider> providers, std::vector<std::vector<int>>& viableRoute );
+    bool check_if_perm_works( std::vector<int> a, std::vector<Provider> providers, std::vector<std::vector<int>>& viableRoute );
     void setClientsToDeliverTo(std::vector<int> clients);
-
+    void checkProviderCombinations(int set_size, std::vector<std::vector<int>>& providerId, std::vector<Provider>& providers);
     int getCapacity() const;
 };
 
