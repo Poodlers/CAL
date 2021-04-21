@@ -27,6 +27,7 @@ bool DeliveryCar::addToShoppingList(std::string ProductName, int amount) {
 }
 
 void DeliveryCar::printShoppingList() {
+    std::cout << "List of products for deliveryCar number " << this->id << " is: " << std::endl;
     for(auto& order: shoppingList){
         std::cout << order.first << " - " << order.second << std::endl;
     }
@@ -78,7 +79,11 @@ void DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider> 
     unordered_map<string,int> availableStock;
     Provider* currProvider;
     vector<int> possibleRoute;
+    if(a.size() == 0){
+        return;
+    }
     for( int i = 0 ; i < a.size() ; ++i ){
+
         currProvider = &providers[a[i]];
         possibleRoute.push_back(a[i]);
         for(auto& product: currProvider->getStock()){
@@ -110,7 +115,7 @@ void DeliveryCar::setClientsToDeliverTo(std::vector<int> clients) {
     this->clientsToDeliverTo = clients;
 }
 
-vector<Node> DeliveryCar::getBestPossiblePath(std::vector<std::vector<int>> clientIds, std::vector<Provider> &providers,
+vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
                                               std::vector<Client> &clients, Graph<Node> &graph)  {
     int providerlen = 0;
     int a[1000];
@@ -118,6 +123,7 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<std::vector<int>> clie
         a[i] = i;
         providerlen++;
     }
+    //fillShoppingList(clientsToDeliverTo, clients);
     vector<vector<int>> combinations;
     printPowerSet(a, providerlen, combinations);
     vector<vector<int>> viableRoutes;
@@ -138,73 +144,66 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<std::vector<int>> clie
     //now we can get all the possible permutations on how to visit our clients!
     double bestClientCost = 99999;
     vector<Node> bestRoute;
+    /*
     for(auto& clientCombos: clientIds){
-        fillShoppingList(clientCombos, clients);
-        vector<int> clientIds = clientCombos;
-        vector<vector<Node>> allPathsToSearch;
-        vector<vector<int>> allClientPerms;
-        findPermutations(clientIds,allClientPerms);
-        //display2Dvec(allClientPerms);
+     */
+    vector<int> clientIds = clientsToDeliverTo;
+    vector<vector<Node>> allPathsToSearch;
+    vector<vector<int>> allClientPerms;
+    findPermutations(clientIds,allClientPerms);
+    //display2Dvec(allClientPerms);
 
-        vector<Node> Path;
-        vector<Node> provPath;
-        for(auto& provPerm: allProviderPerms){
-            provPath = {graph.getOriginNode()}; //source node of the company
-            for(auto& prov: provPerm) {
-                provPath.push_back(providers[prov]);
+    vector<Node> Path;
+    vector<Node> provPath;
+    for(auto& provPerm: allProviderPerms){
+        provPath = {graph.getOriginNode()}; //source node of the company
+        for(auto& prov: provPerm) {
+            provPath.push_back(providers[prov]);
+        }
+        for(auto& clientPerm: allClientPerms){
+            Path = provPath;
+            for(auto& client: clientPerm){
+                Path.push_back(clients[client]);
             }
-            for(auto& clientPerm: allClientPerms){
-                Path = provPath;
-                for(auto& client: clientPerm){
-                    Path.push_back(clients[client]);
-                }
-                allPathsToSearch.push_back(Path);
-            }
-
+            allPathsToSearch.push_back(Path);
         }
 
-        vector<Node> intermediatePaths;
-        vector<Node> best;
-        vector<Node> currPath;
-        double bestCost = 99999;
-        double costToTravel;
-        for(auto& path1: allPathsToSearch){
-            currPath = {};
-            costToTravel = 0;
-            for(int i = 0; i < path1.size(); i++){
+    }
 
-                currPath.push_back(path1[i]);
-                if(i < path1.size() - 1){
-                    //get the shortest path between these two vertices
-                    graph.dijkstraShortestPath(path1[i]);
-                    intermediatePaths = graph.getPath(path1[i], path1[i + 1]);
-                    //add the cost to travel in between these two nodes
-                    for(int c = 0; c < intermediatePaths.size(); c++){
-                        if(c < intermediatePaths.size() - 1){
-                            Vertex<Node>* nextVertex = graph.findVertex(intermediatePaths[c + 1]);
-                            Vertex<Node>* currVertex = graph.findVertex(intermediatePaths[c]);
-                            costToTravel += currVertex->getEdgeDistance(nextVertex);
-                        }
-
+    vector<Node> intermediatePaths;
+    vector<Node> best;
+    vector<Node> currPath;
+    double bestCost = 99999;
+    double costToTravel;
+    for(auto& path1: allPathsToSearch){
+        currPath = {};
+        costToTravel = 0;
+        for(int i = 0; i < path1.size(); i++){
+            currPath.push_back(path1[i]);
+            if(i < path1.size() - 1){
+                //get the shortest path between these two vertices
+                graph.dijkstraShortestPath(path1[i]);
+                intermediatePaths = graph.getPath(path1[i], path1[i + 1]);
+                //add the cost to travel in between these two nodes
+                for(int c = 0; c < intermediatePaths.size(); c++){
+                    if(c < intermediatePaths.size() - 1){
+                        Vertex<Node>* nextVertex = graph.findVertex(intermediatePaths[c + 1]);
+                        Vertex<Node>* currVertex = graph.findVertex(intermediatePaths[c]);
+                        costToTravel += currVertex->getEdgeDistance(nextVertex);
                     }
+
                 }
-
             }
-            if(costToTravel < bestCost){
-                bestCost = costToTravel;
-                best = currPath;
 
-            }
         }
+        if(costToTravel < bestCost){
+            bestCost = costToTravel;
+            best = currPath;
 
-        if(bestCost < bestClientCost){
-            bestClientCost = bestCost;
-            setClientsToDeliverTo(clientCombos);
-            bestRoute = best;
         }
     }
 
-    return bestRoute;
+    return best;
 
 }
 

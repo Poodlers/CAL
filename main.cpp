@@ -1,8 +1,8 @@
 #include <iostream>
+#include <chrono>
 #include "productprovider.h"
 #include "Graph.h"
 #include "deliveryCar.h"
-#include <iomanip>
 
 using namespace std;
 
@@ -173,24 +173,7 @@ void printPowerSet2(int set[], int set_size, vector<vector<int>>& clientId)
     }
 }
 
-int main() {
-    Graph<Node> graph;
-    //distribute clients to cars
-
-    vector<Client> clients;
-    vector<Provider> providers;
-    fill_client_and_provider(clients,providers);
-    DeliveryCar deliveryCar("1",3);
-    DeliveryCar deliveryCar1("2", 2);
-
-    vector<DeliveryCar> deliveryCars = {deliveryCar,deliveryCar1};
-    sort(deliveryCars.begin(), deliveryCars.end(), [](const DeliveryCar d1, const DeliveryCar d2){
-        return d1.getCapacity() < d2.getCapacity();
-    });
-    sort(clients.begin(), clients.end(), [](const Client c1, const Client c2){
-        return c1.getNumOfProducts() < c2.getNumOfProducts();
-    });
-
+void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client>& clients){
     vector<vector<int>> allClientsCombos = {};
     int clientLen = 0;
     int a[1000];
@@ -203,17 +186,19 @@ int main() {
     double clientWeight = 0;
     double biggestWeightYet = -1;
     vector<int> clientsToDeliver;
-    for(DeliveryCar deliveryCar2: deliveryCars) {
+    for(DeliveryCar* deliveryCar2: deliveryCars) {
         clientsToDeliver = {};
+        biggestWeightYet = -1;
         for (auto &set: allClientsCombos) {
             clientWeight = 0;
             for (int client : set) {
                 clientWeight += clients[client].getNumOfProducts();
             }
-            if (clientWeight <= deliveryCar2.getCapacity() && clientWeight > biggestWeightYet) {
+            if (clientWeight <= deliveryCar2->getCapacity() && clientWeight > biggestWeightYet) {
                 biggestWeightYet = clientWeight;
                 clientsToDeliver = set;
-                deliveryCar2.setClientsToDeliverTo(set);
+                deliveryCar2->setClientsToDeliverTo(set);
+                deliveryCar2->fillShoppingList(set,clients);
             }
         }
 
@@ -236,30 +221,58 @@ int main() {
                 ++i;
         }
     }
+}
 
+int main() {
 
-    int biggestLen = 0;
-    vector<vector<int>> clientIds;
-    for(auto& combination: allClientsCombos){
-        if(combination.size() > biggestLen){
-            biggestLen = combination.size();
-            clientIds = {};
-            clientIds.push_back(combination);
-        }
-        else if(combination.size() == biggestLen){
-            clientIds.push_back(combination);
-        }
-    }
+    Graph<Node> graph;
+    //distribute clients to cars
+
+    vector<Client> clients;
+    vector<Provider> providers;
+    //create provider and client information
+    fill_client_and_provider(clients,providers);
+
+    //create delivery cars
+    DeliveryCar deliveryCar("1",3);
+    DeliveryCar deliveryCar1("2", 2);
+
+    vector<DeliveryCar *> deliveryCars = {&deliveryCar,&deliveryCar1};
+
+    //we do a little sorting
+    sort(deliveryCars.begin(), deliveryCars.end(), [](const DeliveryCar* d1, const DeliveryCar* d2){
+        return d1->getCapacity() < d2->getCapacity();
+    });
+    sort(clients.begin(), clients.end(), [](const Client c1, const Client c2){
+        return c1.getNumOfProducts() < c2.getNumOfProducts();
+    });
+
+    planRouteForCars(deliveryCars,clients);
 
     //makeGraph(graph,clients,providers);
+
     makeGraph2(graph,clients,providers);
-    deliveryCar.printShoppingList();
+
+    for(DeliveryCar* deliveryCar2: deliveryCars){
+        deliveryCar2->printShoppingList();
+    }
 
     //next deliveryCar must check what combinations of providers it can go to get the necessary products;
-    vector<Node> bestPath = deliveryCar.getBestPossiblePath(clientIds,providers,clients,graph);
+    auto start1 = chrono::steady_clock::now();
+    vector<Node> bestPath = deliveryCar.getBestPossiblePath(providers,clients,graph);
+    vector<Node> bestPath2 = deliveryCar1.getBestPossiblePath(providers,clients,graph);
     //check which path costs less and its done!
+    auto end1 = chrono::steady_clock::now();
     for(Node node: bestPath) {
         cout << node.getId() <<  "-> ";
     }
+    cout << "\n";
+
+    for(Node node: bestPath2) {
+        cout << node.getId() <<  "-> ";
+    }
+    cout << "\n";
+
+    cout << "ran for: " << chrono::duration_cast<chrono::microseconds>(end1 - start1).count() << " micro seconds \n";
     return 0;
 }
