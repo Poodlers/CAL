@@ -184,12 +184,6 @@ vector<Node> whereCarWithNoWeightLimit(Graph<Node> graph, vector<Provider> provi
             best_dist = costToTravel;
             best_num_fabrics = num_fabrics;
         }
-        if (num_clients > best_num_of_clients){
-            best = path1;
-            best_num_of_clients = num_clients;
-            best_dist = costToTravel;
-            best_num_fabrics = num_fabrics;
-        }
         else if (num_clients ==  best_num_of_clients && best_dist > costToTravel){
             best = path1;
             best_num_of_clients = num_clients;
@@ -330,33 +324,33 @@ int main() {
     /****/
     auto start = chrono::steady_clock::now();
 
-    vector<Node> best = whereCarWithNoWeightLimit(graph,providers,clients, node1);
+    //vector<Node> best = whereCarWithNoWeightLimit(graph,providers,clients, node1);
 
     auto end = chrono::steady_clock::now();
     /****/
-
+    /*
    for (int i = 0; i < best.size(); i++){
         cout << " " << best[i].getId();
     }
 
     cout << "\nran for: "<< chrono::duration_cast<chrono::microseconds>(end - start).count() << " micro seconds \n";
-
+    */
 
     vector<Node> result, providers1, curr_path;
     vector<Node*> providers2;
     vector<int> cars;
-    cars.push_back(2);
     cars.push_back(3);
+    cars.push_back(2);
     int max_nodes= 0, min_dist = 10000, min_fab = 10000, best_weight = 0;
 
     /****/
     auto start1 = chrono::steady_clock::now();
 
-    graph.whereCarWithNoWeightLimitBacktracking(0, max_nodes, node1, node1, providers1, curr_path, result, min_dist, min_fab, 0, 0);
+    //graph.whereCarWithNoWeightLimitBacktracking(0, max_nodes, node1, node1, providers1, curr_path, result, min_dist, min_fab, 0, 0);
 
     //graph.whereCarWithWeightLimitBacktracking(0, max_nodes, node1, node1, providers1, curr_path, result, min_dist, min_fab, 0, 0,2,0,best_weight);
 
-    //graph.whereCarsWithWeightLimitBacktracking(0, max_nodes, node1, node1, providers2, curr_path, result, min_dist, min_fab, 0, 0,cars,0,0,0,best_weight);
+    graph.whereCarsWithWeightLimitBacktracking(0, max_nodes, node1, node1, providers2, curr_path, result, min_dist, min_fab, 0, 0,cars,0,0,0,best_weight);
     auto end1 = chrono::steady_clock::now();
     /****/
 

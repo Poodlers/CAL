@@ -574,7 +574,8 @@ void Graph<T>::whereCarsWithWeightLimitBacktracking(int visited_nodes, int &max_
                 v2->visited = false;
             }
         }
-        whereCarsWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,node1,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap, current_car+1, 0,total_weight_used, best_weight);
+        std::vector<T*> providers1 = {};
+        whereCarsWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,node1,providers1, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap, current_car+1, 0,total_weight_used, best_weight);
         cur_path = copyPath;
         total_weight_used -= weight_used;
     }
