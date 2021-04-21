@@ -67,10 +67,10 @@ RM = "C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E 
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO"
+CMAKE_SOURCE_DIR = "C:\Users\Joana\Documents\Uni\Concepcao e Analise de Algoritmos\proj\cal_mp1_jinga"
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug"
+CMAKE_BINARY_DIR = "C:\Users\Joana\Documents\Uni\Concepcao e Analise de Algoritmos\proj\cal_mp1_jinga\cmake-build-debug"
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -99,9 +99,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles" "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles\progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\Joana\Documents\Uni\Concepcao e Analise de Algoritmos\proj\cal_mp1_jinga\cmake-build-debug\CMakeFiles" "C:\Users\Joana\Documents\Uni\Concepcao e Analise de Algoritmos\proj\cal_mp1_jinga\cmake-build-debug\CMakeFiles\progress.marks"
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start "C:\Users\Joana\Documents\Uni\Concepcao e Analise de Algoritmos\proj\cal_mp1_jinga\cmake-build-debug\CMakeFiles" 0
 .PHONY : all
 
 # The main clean target

@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cmath>
 #include <iostream>
+
 #include "MutablePriorityQueue.h"
 
 
@@ -133,7 +134,12 @@ public:
     void bellmanFordShortestPath(const T &s);   //TODO...
     std::vector<T> getPath(const T &origin, const T &dest) const;   //TODO...
 
-    // Fp06 - all pairs
+    void whereCarWithNoWeightLimitBacktracking(int visited_nodes, int &max_nodes, Node node1, Node last_node, std::vector<T> providers , std::vector<Node> cur_path, std::vector<Node>& best_path, int &min_dist, int &min_fab, int cur_distance, int cur_fab);
+    void whereCarWithWeightLimitBacktracking(int visited_nodes, int &max_nodes, Node node1, Node last_node, std::vector<T> providers , std::vector<Node> cur_path, std::vector<Node>& best_path, int &min_dist, int &min_fab, int cur_distance, int cur_fab, int car_cap, int weight_used, int &best_weight);
+    void whereCarsWithWeightLimitBacktracking(int visited_nodes, int &max_nodes, Node node1, Node last_node, std::vector<T*> providers , std::vector<Node> cur_path, std::vector<Node>& best_path, int &min_dist, int &min_fab, int cur_distance, int cur_fab, std::vector<int> car_cap,int current_car, int weight_used, int total_weight_used, int &best_weight);
+
+
+        // Fp06 - all pairs
     void floydWarshallShortestPath();   //TODO...
     std::vector<T> getfloydWarshallPath(const T &origin, const T &dest) const;   //TODO...
 
@@ -199,6 +205,384 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 
 
 /**************** Single Source Shortest Path algorithms ************/
+template<class T>
+void Graph<T>::whereCarWithNoWeightLimitBacktracking(int visited_nodes, int &max_nodes, Node node1, Node last_node, std::vector<T> providers , std::vector<Node> cur_path, std::vector<Node>& best_path, int &min_dist, int &min_fab, int cur_distance, int cur_fab){
+    Vertex<Node>* v1 = this->findVertex(last_node);
+    cur_path.push_back(last_node);
+    if (last_node == node1){
+        for (int i = 0; i < v1->adj.size(); i++){
+            std::string a = v1->adj[i].dest->info.getTypeOfNode();
+            if (v1->adj[i].dest->info.getTypeOfNode() == "Provider"){
+                providers.push_back(v1->adj[i].dest->info);
+                cur_fab ++;
+                cur_distance += v1->adj[i].getWeight();
+                v1->adj[i].dest->visited = true;
+                whereCarWithNoWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers,cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab);
+                cur_fab --;
+                v1->adj[i].dest->visited = false;
+                cur_distance -= v1->adj[i].getWeight();
+                providers.pop_back();
+            }
+        }
+    }
+    else{
+        for (int i = 0; i < v1->adj.size(); i++){
+            if (v1->adj[i].dest->info.getTypeOfNode() == "Provider" && !v1->adj[i].dest->visited){
+                providers.push_back(v1->adj[i].dest->info);
+                cur_fab ++;
+                cur_distance += v1->adj[i].getWeight();
+                v1->adj[i].dest->visited = true;
+                whereCarWithNoWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab);
+                cur_fab --;
+                v1->adj[i].dest->visited = false;
+                cur_distance -= v1->adj[i].getWeight();
+                providers.pop_back();
+            }
+            else if(v1->adj[i].dest->info.getTypeOfNode() == "Client" && !v1->adj[i].dest->visited){
+                std::vector<T> provCop = providers;
+                Node clientCop = v1->adj[i].dest->info;
+                for (int e = 0; e < providers.size(); e++){
+                    std::unordered_map<std::string,int> m1 = providers[e].getStock();
+                    std::unordered_map<std::string,int> c1 = v1->adj[i].dest->info.getOrder();
+                    for(auto& product: m1){
+                        for (auto& prod: c1){
+                            if (prod.second != 0){
+                                if (product.first == prod.first){
+                                    if (product.second >= prod.second){
+                                        m1[product.first] = product.second - prod.second;
+                                        c1[prod.first] = 0;
+                                    }
+                                    else if(product.second < prod.second){
+                                        c1[prod.first] = prod.second - product.second;
+                                        m1[product.first] = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    v1->adj[i].dest->info.changeMap(c1);
+                    providers[e].changeMap(m1);
+                }
+                bool n = true;
+                for (auto& prod: v1->adj[i].dest->info.getOrder()){
+                    if (prod.second != 0) {
+                        n = false;
+                        providers = provCop;
+                        v1->adj[i].dest->info.changeMap(clientCop.getStock());
+                        break;
+                    }
+                }
+                if (n){
+                    visited_nodes ++;
+                    cur_distance += v1->adj[i].getWeight();
+                    v1->adj[i].dest->visited = true;
+                    whereCarWithNoWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab);
+                    visited_nodes --;
+                    cur_distance -= v1->adj[i].getWeight();
+                    v1->adj[i].dest->visited = false;
+                    providers = provCop;
+                    v1->adj[i].dest->info.changeMap(clientCop.getStock());
+                }
+            }
+        }
+    }
+
+    if (visited_nodes > max_nodes){
+        best_path = cur_path;
+        max_nodes = visited_nodes;
+        min_dist = cur_distance;
+        min_fab = cur_fab;
+
+    }
+    else if(visited_nodes == max_nodes && min_dist > cur_distance){
+        best_path = cur_path;
+        min_dist = cur_distance;
+        min_fab = cur_fab;
+    }
+    else if(visited_nodes == max_nodes && min_dist == cur_distance && min_fab > cur_fab){
+        best_path = cur_path;
+        min_fab = cur_fab;
+    }
+    return;
+
+}
+
+
+template<class T>
+void Graph<T>::whereCarWithWeightLimitBacktracking(int visited_nodes, int &max_nodes, Node node1, Node last_node, std::vector<T> providers , std::vector<Node> cur_path, std::vector<Node>& best_path, int &min_dist, int &min_fab, int cur_distance, int cur_fab, int car_cap, int weight_used, int &best_weight){
+    Vertex<Node>* v1 = this->findVertex(last_node);
+    cur_path.push_back(last_node);
+    if (last_node == node1){
+        for (int i = 0; i < v1->adj.size(); i++){
+            std::string a = v1->adj[i].dest->info.getTypeOfNode();
+            if (v1->adj[i].dest->info.getTypeOfNode() == "Provider"){
+                providers.push_back(v1->adj[i].dest->info);
+                cur_fab ++;
+                cur_distance += v1->adj[i].getWeight();
+                v1->adj[i].dest->visited = true;
+                whereCarWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers,cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap, weight_used, best_weight);
+                cur_fab --;
+                v1->adj[i].dest->visited = false;
+                cur_distance -= v1->adj[i].getWeight();
+                providers.pop_back();
+            }
+        }
+    }
+    else{
+        for (int i = 0; i < v1->adj.size(); i++){
+            if (v1->adj[i].dest->info.getTypeOfNode() == "Provider" && !v1->adj[i].dest->visited){
+                providers.push_back(v1->adj[i].dest->info);
+                cur_fab ++;
+                cur_distance += v1->adj[i].getWeight();
+                v1->adj[i].dest->visited = true;
+                whereCarWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap, weight_used, best_weight);
+                cur_fab --;
+                v1->adj[i].dest->visited = false;
+                cur_distance -= v1->adj[i].getWeight();
+                providers.pop_back();
+            }
+            else if(v1->adj[i].dest->info.getTypeOfNode() == "Client" && !v1->adj[i].dest->visited){
+                std::vector<T> provCop = providers;
+                Node clientCop = v1->adj[i].dest->info;
+                int weight_needed = 0;
+                for (auto& prod: v1->adj[i].dest->info.getOrder()){
+                    weight_needed += prod.second;
+                }
+                if (weight_needed + weight_used > car_cap){
+                    break;
+                }
+                for (int e = 0; e < providers.size(); e++){
+                    std::unordered_map<std::string,int> m1 = providers[e].getStock();
+                    std::unordered_map<std::string,int> c1 = v1->adj[i].dest->info.getOrder();
+                    for(auto& product: m1){
+                        for (auto& prod: c1){
+                            if (prod.second != 0){
+                                if (product.first == prod.first){
+                                    if (product.second >= prod.second){
+                                        m1[product.first] = product.second - prod.second;
+                                        c1[prod.first] = 0;
+                                    }
+                                    else if(product.second < prod.second){
+                                        c1[prod.first] = prod.second - product.second;
+                                        m1[product.first] = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    v1->adj[i].dest->info.changeMap(c1);
+                    providers[e].changeMap(m1);
+                }
+                bool n = true;
+                for (auto& prod: v1->adj[i].dest->info.getOrder()){
+                    if (prod.second != 0) {
+                        n = false;
+                        providers = provCop;
+                        v1->adj[i].dest->info.changeMap(clientCop.getStock());
+                        break;
+                    }
+                }
+                if (n){
+                    visited_nodes ++;
+                    cur_distance += v1->adj[i].getWeight();
+                    v1->adj[i].dest->visited = true;
+                    weight_used += weight_needed;
+                    whereCarWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap, weight_used, best_weight);
+                    visited_nodes --;
+                    cur_distance -= v1->adj[i].getWeight();
+                    v1->adj[i].dest->visited = false;
+                    weight_used -= weight_needed;
+                    providers = provCop;
+                    v1->adj[i].dest->info.changeMap(clientCop.getStock());
+                }
+            }
+        }
+    }
+    if (visited_nodes > max_nodes){
+        best_path = cur_path;
+        max_nodes = visited_nodes;
+        min_dist = cur_distance;
+        min_fab = cur_fab;
+        best_weight = weight_used;
+
+    }
+    else if (visited_nodes == max_nodes && best_weight < weight_used){
+        best_path = cur_path;
+        max_nodes = visited_nodes;
+        min_dist = cur_distance;
+        min_fab = cur_fab;
+        best_weight = weight_used;
+    }
+    else if(visited_nodes == max_nodes && best_weight == weight_used && min_dist > cur_distance){
+        best_path = cur_path;
+        max_nodes = visited_nodes;
+        min_dist = cur_distance;
+        min_fab = cur_fab;
+        best_weight = weight_used;
+    }
+    else if(visited_nodes == max_nodes && best_weight == weight_used && min_dist == cur_distance && min_fab > cur_fab){
+        best_path = cur_path;
+        max_nodes = visited_nodes;
+        min_dist = cur_distance;
+        min_fab = cur_fab;
+        best_weight = weight_used;
+    }
+    return;
+
+}
+
+template<class T>
+void Graph<T>::whereCarsWithWeightLimitBacktracking(int visited_nodes, int &max_nodes, Node node1, Node last_node, std::vector<T*> providers , std::vector<Node> cur_path, std::vector<Node>& best_path, int &min_dist, int &min_fab, int cur_distance, int cur_fab, std::vector<int> car_cap,int current_car, int weight_used, int total_weight_used, int &best_weight){
+    Vertex<Node>* v1 = this->findVertex(last_node);
+    cur_path.push_back(last_node);
+    if (last_node == node1){
+        for (int i = 0; i < v1->adj.size(); i++){
+            std::string a = v1->adj[i].dest->info.getTypeOfNode();
+            if (v1->adj[i].dest->info.getTypeOfNode() == "Provider"){
+                providers.push_back(&v1->adj[i].dest->info);
+                cur_fab ++;
+                cur_distance += v1->adj[i].getWeight();
+                v1->adj[i].dest->visited = true;
+                whereCarsWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap,current_car, weight_used, total_weight_used, best_weight);
+                cur_fab --;
+                v1->adj[i].dest->visited = false;
+                cur_distance -= v1->adj[i].getWeight();
+                providers.pop_back();
+            }
+        }
+    }
+    else{
+        for (int i = 0; i < v1->adj.size(); i++){
+            if (v1->adj[i].dest->info.getTypeOfNode() == "Provider" && !v1->adj[i].dest->visited){
+                providers.push_back(&v1->adj[i].dest->info);
+                cur_fab ++;
+                cur_distance += v1->adj[i].getWeight();
+                v1->adj[i].dest->visited = true;
+                whereCarsWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap,current_car, weight_used, total_weight_used, best_weight);
+                cur_fab --;
+                v1->adj[i].dest->visited = false;
+                cur_distance -= v1->adj[i].getWeight();
+                providers.pop_back();
+            }
+            else if(v1->adj[i].dest->info.getTypeOfNode() == "Client" && !v1->adj[i].dest->visited){
+                std::vector<T> provCop;
+                Node clientCop = v1->adj[i].dest->info;
+                int weight_needed = 0;
+                for (auto& prod: v1->adj[i].dest->info.getOrder()){
+                    weight_needed += prod.second;
+                }
+                if (weight_needed + weight_used > car_cap[current_car]){
+                    break;
+                }
+                for (int e = 0; e < providers.size(); e++){
+                    provCop.push_back(*providers[e]);
+                    std::unordered_map<std::string,int> m1 = providers[e]->getStock();
+                    std::unordered_map<std::string,int> c1 = v1->adj[i].dest->info.getOrder();
+                    for(auto& product: m1){
+                        for (auto& prod: c1){
+                            if (prod.second != 0){
+                                if (product.first == prod.first){
+                                    if (product.second >= prod.second){
+                                        m1[product.first] = product.second - prod.second;
+                                        c1[prod.first] = 0;
+                                    }
+                                    else if(product.second < prod.second){
+                                        c1[prod.first] = prod.second - product.second;
+                                        m1[product.first] = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    v1->adj[i].dest->info.changeMap(c1);
+                    providers[e]->changeMap(m1);
+
+                }
+                bool n = true;
+                for (auto& prod: v1->adj[i].dest->info.getOrder()){
+                    if (prod.second != 0) {
+                        n = false;
+                        for (int s = 0; s<providers.size(); s++){
+                            providers[s]->changeMap(provCop[s].getStock());
+                        }
+                        v1->adj[i].dest->info.changeMap(clientCop.getStock());
+                        break;
+                    }
+                }
+                if (n){
+                    visited_nodes ++;
+                    cur_distance += v1->adj[i].getWeight();
+                    v1->adj[i].dest->visited = true;
+                    weight_used += weight_needed;
+                    Vertex<T> *v3;
+                    whereCarsWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,v1->adj[i].dest->info,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap,current_car, weight_used, total_weight_used, best_weight);
+                    visited_nodes --;
+                    cur_distance -= v1->adj[i].getWeight();
+                    v1->adj[i].dest->visited = false;
+                    weight_used -= weight_needed;
+                    for (int s = 0; s<providers.size(); s++){
+                        providers[s]->changeMap(provCop[s].getStock());
+                    }
+                    v1->adj[i].dest->info.changeMap(clientCop.getStock());
+                }
+            }
+            if(current_car == 0 && i == v1->adj.size() -1){
+                return;
+            }
+        }
+    }
+
+    if (current_car == car_cap.size() -1){
+        if (visited_nodes > max_nodes){
+            best_path = cur_path;
+            max_nodes = visited_nodes;
+            min_dist = cur_distance;
+            min_fab = cur_fab;
+            best_weight = total_weight_used;
+
+        }
+        else if (visited_nodes == max_nodes && best_weight < total_weight_used){
+            best_path = cur_path;
+            max_nodes = visited_nodes;
+            min_dist = cur_distance;
+            min_fab = cur_fab;
+            best_weight = total_weight_used;
+        }
+        else if(visited_nodes == max_nodes && best_weight == total_weight_used && min_dist > cur_distance){
+            best_path = cur_path;
+            max_nodes = visited_nodes;
+            min_dist = cur_distance;
+            min_fab = cur_fab;
+            best_weight = total_weight_used;
+        }
+        else if(visited_nodes == max_nodes && best_weight == total_weight_used && min_dist == cur_distance && min_fab > cur_fab){
+            best_path = cur_path;
+            max_nodes = visited_nodes;
+            min_dist = cur_distance;
+            min_fab = cur_fab;
+            best_weight = total_weight_used;
+        }
+        return;
+    }
+    else{
+        total_weight_used += weight_used;
+        std::vector<T> copyPath= cur_path;
+        for (int i = 0; i<cur_path.size();i++){
+            Vertex<T> *v2;
+            if (cur_path[i].getTypeOfNode() == "Provider"){
+                v2 = findVertex(cur_path[i]);
+                v2->visited = false;
+            }
+        }
+        whereCarsWithWeightLimitBacktracking(visited_nodes, max_nodes,node1,node1,providers, cur_path, best_path, min_dist, min_fab, cur_distance, cur_fab, car_cap, current_car+1, 0,total_weight_used, best_weight);
+        cur_path = copyPath;
+        total_weight_used -= weight_used;
+    }
+
+}
+
+
+
 
 template<class T>
 void Graph<T>::unweightedShortestPath(const T &orig) {

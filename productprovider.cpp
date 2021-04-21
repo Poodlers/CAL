@@ -1,22 +1,20 @@
 #include "productprovider.h"
 
-std::string Provider::getTypeOfNode() {
-    return "Provider";
-}
 
-Provider::Provider(std::string id):Node(id) {};
+
+Provider::Provider(std::string id):Node(id) {
+    type = "Provider";
+};
 
 bool Provider::addProduct(std::string productName, int stock) {
-    if(this->stock.find(productName) != this->stock.end()){
-        this->stock[productName] = this->stock[productName] + stock;
+    if(this->n1.find(productName) != this->n1.end()){
+        this->n1[productName] = this->n1[productName] + stock;
     }else{
-        this->stock[productName] = stock;
+        this->n1[productName] = stock;
     }
+    return true;
 }
 
-const std::unordered_map<std::string, int> &Provider::getStock() const {
-    return stock;
-}
 
 bool Provider::operator==(const Node &node) const {
     return this->getId() == node.getId();

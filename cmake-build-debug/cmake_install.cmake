@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO
+# Install script for directory: C:/Users/Joana/Documents/Uni/Concepcao e Analise de Algoritmos/proj/cal_mp1_jinga
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "C:/Users/Joana/Documents/Uni/Concepcao e Analise de Algoritmos/proj/cal_mp1_jinga/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

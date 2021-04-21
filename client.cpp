@@ -1,22 +1,19 @@
 #include "client.h"
 
-std::string Client::getTypeOfNode() {
-    return "Client";
-}
 
-Client::Client(std::string id) : Node(id) {};
+
+Client::Client(std::string id) : Node(id) {
+    type = "Client";
+};
 
 bool Client::addOrder(std::string productName, int stock) {
-    if(this->order.find(productName) != this->order.end()){
-        this->order[productName] = this->order[productName] + stock;
+    if(this->n1.find(productName) != this->n1.end()){
+        this->n1[productName] = this->n1[productName] + stock;
     }else{
-        this->order[productName] = stock;
+        this->n1[productName] = stock;
     }
 }
 
-std::unordered_map<std::string, int> Client::getOrder() {
-    return this->order;
-}
 bool Client::operator!=(const Node &node) const {
     return getId() != node.getId();
 }

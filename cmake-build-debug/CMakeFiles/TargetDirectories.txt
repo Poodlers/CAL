@@ -1,3 +1,3 @@
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CAL_MP1_ALGO.dir
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/Joana/Documents/Uni/Concepcao e Analise de Algoritmos/proj/cal_mp1_jinga/cmake-build-debug/CMakeFiles/CAL_MP1_ALGO.dir
+C:/Users/Joana/Documents/Uni/Concepcao e Analise de Algoritmos/proj/cal_mp1_jinga/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Joana/Documents/Uni/Concepcao e Analise de Algoritmos/proj/cal_mp1_jinga/cmake-build-debug/CMakeFiles/rebuild_cache.dir
