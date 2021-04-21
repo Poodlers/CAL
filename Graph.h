@@ -119,13 +119,15 @@ Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w) {}
 template <class T>
 class Graph {
     std::vector<Vertex<T> *> vertexSet;    // vertex set
-
+    int originNode = 0;
 public:
     Vertex<T> *findVertex(const T &in) const;
     bool addVertex(const T &in);
     bool addEdge(const T &sourc, const T &dest, double w);
     int getNumVertex() const;
     std::vector<Vertex<T> *> getVertexSet() const;
+    void setOriginNode(int originNode);
+    T getOriginNode();
 
     // Fp06 - single source
     void unweightedShortestPath(const T &s);    //TODO...
@@ -228,6 +230,15 @@ void Graph<T>::unweightedShortestPath(const T &orig) {
 
 }
 
+template <class T>
+void Graph<T>::setOriginNode(int originNode) {
+    this->originNode = originNode;
+}
+
+template <class T>
+T Graph<T>::getOriginNode() {
+    return this->vertexSet[originNode]->info;
+}
 
 template<class T>
 void Graph<T>::dijkstraShortestPath(const T &origin) {

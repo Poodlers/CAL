@@ -24,3 +24,11 @@ bool Client::operator!=(const Node &node) const {
 bool Client::operator==(const Node &node) const {
     return getId() == node.getId();
 }
+
+int Client::getNumOfProducts() const{
+    int totalCapacity = 0;
+    for(auto& prod: this->order){
+        totalCapacity += prod.second;
+    }
+    return totalCapacity;
+}

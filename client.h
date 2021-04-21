@@ -15,6 +15,7 @@ public:
     std::unordered_map<std::string, int> getOrder();
     bool operator==(const Node& node) const;
     bool operator!=(const Node& node) const;
+    int getNumOfProducts() const;
 };
 
 #endif //CAL_MP1_ALGO_PROD_H
