@@ -328,8 +328,8 @@ int main() {
 
     auto end = chrono::steady_clock::now();
     /****/
-    /*
-   for (int i = 0; i < best.size(); i++){
+
+   /*for (int i = 0; i < best.size(); i++){
         cout << " " << best[i].getId();
     }
 
@@ -342,15 +342,17 @@ int main() {
     cars.push_back(3);
     cars.push_back(2);
     int max_nodes= 0, min_dist = 10000, min_fab = 10000, best_weight = 0;
-
+    vector<Client> clients1 = {client1,client2};
     /****/
     auto start1 = chrono::steady_clock::now();
 
     //graph.whereCarWithNoWeightLimitBacktracking(0, max_nodes, node1, node1, providers1, curr_path, result, min_dist, min_fab, 0, 0);
 
-    //graph.whereCarWithWeightLimitBacktracking(0, max_nodes, node1, node1, providers1, curr_path, result, min_dist, min_fab, 0, 0,2,0,best_weight);
+    //graph.whereCarWithWeightLimitBacktracking(0, max_nodes, node1, node1, providers1, curr_path, result, min_dist, min_fab, 0, 0,4,0,best_weight);
 
-    graph.whereCarsWithWeightLimitBacktracking(0, max_nodes, node1, node1, providers2, curr_path, result, min_dist, min_fab, 0, 0,cars,0,0,0,best_weight);
+    //graph.whereCarsWithWeightLimitBacktracking(0, max_nodes, node1, node1, providers2, curr_path, result, min_dist, min_fab, 0, 0,cars,0,0,0,best_weight);
+
+    graph.whereCarWithWeightLimitBacktrackingA(0, max_nodes, node1, node1, providers1, curr_path, result, min_dist, min_fab, 0, 0,4,0,best_weight,clients);
     auto end1 = chrono::steady_clock::now();
     /****/
 

@@ -16,6 +16,19 @@ void Node::changeMap(std::unordered_map<std::string, int> m1){
     n1 = m1;
 }
 
+bool Node::checkIfMeetsRequirement(std::unordered_map<std::string, int> &shoppingList) {
+    for(auto& prod: this->n1){
+        if(shoppingList.find(prod.first) == shoppingList.end()){
+            return false;
+        }
+        if(prod.second > shoppingList[prod.first]){
+            return false;
+        }
+
+    }
+    return true;
+}
+
 Node::Node(std::string id) {
     this->id = id;
 }

@@ -21,3 +21,4 @@ bool Client::operator!=(const Node &node) const {
 bool Client::operator==(const Node &node) const {
     return getId() == node.getId();
 }
+

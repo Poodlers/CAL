@@ -17,6 +17,7 @@ public:
     std::unordered_map<std::string, int> getOrder();
     const std::unordered_map<std::string, int> &getStock() const;
     void changeMap(std::unordered_map<std::string, int> m1);
+    bool checkIfMeetsRequirement(std::unordered_map<std::string, int> &shoppingList);
     bool operator==(const Node& node) const;
     bool operator!=(const Node& node) const;
 };
