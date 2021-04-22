@@ -14,7 +14,7 @@ public:
     bool addProduct(std::string productName, int stock);
     bool operator==(const Node& node) const;
     bool operator!=(const Node& node) const;
-    const std::unordered_map<std::string, int> &getStock() const;
+    std::unordered_map<std::string, int> &getStock();
 
 };
 

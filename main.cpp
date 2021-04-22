@@ -1,18 +1,11 @@
 #include <iostream>
+#include <algorithm>
 #include <chrono>
 #include "productprovider.h"
 #include "Graph.h"
 #include "deliveryCar.h"
 
 using namespace std;
-
-void display(int a[], int n)
-{
-    for (int i = 0; i < n; i++) {
-        cout << a[i] << "  ";
-    }
-    cout << endl;
-}
 
 void display2Dvec(vector<vector<int>> a)
 {
@@ -22,6 +15,61 @@ void display2Dvec(vector<vector<int>> a)
         }
         cout << endl;
     }
+}
+
+void makeGraph3(Graph<Node>& graph, vector<Client> clients, vector<Provider> providers){
+    Node node1("1");
+    graph.addVertex(node1);
+
+    graph.addVertex(clients[1]);
+    graph.addVertex(providers[0]);
+    graph.addVertex(providers[1]);
+    graph.addVertex(providers[2]);
+    graph.addVertex(clients[0]);
+    graph.addEdge(node1,clients[0],1);
+    graph.addEdge(clients[0],node1,1);
+
+    graph.addEdge(node1,clients[1],2);
+    graph.addEdge(clients[1],node1,2);
+
+    graph.addEdge(node1,providers[0],2);
+    graph.addEdge(providers[0],node1,2);
+
+    graph.addEdge(node1,providers[1],2);
+    graph.addEdge(providers[1],node1,2);
+
+    graph.addEdge(node1,providers[2],1);
+    graph.addEdge(providers[2],node1,1);
+
+    graph.addEdge(clients[1],clients[0],1);
+    graph.addEdge(clients[0],clients[1],1);
+
+    graph.addEdge(providers[0],clients[0],1);
+    graph.addEdge(clients[0],providers[0],1);
+
+    graph.addEdge(providers[1],clients[0],1);
+    graph.addEdge(clients[0],providers[1],1);
+
+    graph.addEdge(providers[2],clients[0],1);
+    graph.addEdge(clients[0],providers[2],1);
+
+    graph.addEdge(providers[0],clients[1],1);
+    graph.addEdge(clients[1],providers[0],1);
+
+    graph.addEdge(providers[1],clients[1],1);
+    graph.addEdge(clients[1],providers[1],1);
+
+    graph.addEdge(providers[2],clients[1],1);
+    graph.addEdge(clients[1],providers[2],1);
+
+    graph.addEdge(providers[0],providers[1],2);
+    graph.addEdge(providers[1],providers[0],2);
+
+    graph.addEdge(providers[0],providers[2],1);
+    graph.addEdge(providers[2],providers[0],1);
+
+    graph.addEdge(providers[2],providers[1],1);
+    graph.addEdge(providers[1],providers[2],1);
 }
 
 void makeGraph2(Graph<Node>& graph, vector<Client> clients, vector<Provider> providers){
@@ -152,75 +200,107 @@ void makeGraph(Graph<Node>& graph, vector<Client> clients, vector<Provider> prov
 
 }
 
-void printPowerSet2(int set[], int set_size, vector<vector<int>>& clientId)
-{
-    /*set_size of power set of a set with set_size
-    n is (2**n -1)*/
-    unsigned int pow_set_size = pow(2, set_size);
-    int counter, j;
-    vector<int> temp;
-    /*Run from counter 000..0 to 111..1*/
-    for(counter = 0; counter < pow_set_size; counter++)
-    {
-        temp = {};
-        for(j = 0; j < set_size; j++)
-        {
-            if(counter & (1 << j))
-                temp.push_back(set[j]);
+bool check_if_available(unordered_map<string,int> availableStock,vector<int> clientId, vector<Client>& clients){
+    for(int i = 0; i < clientId.size();i++){
+        for(auto& product: clients[clientId[i]].getOrder()){
+            if(availableStock.find(product.first) != availableStock.end()){
+                if(availableStock[product.first] - product.second >= 0){
+                    availableStock[product.first] -= product.second;
+                }else{
+                    return false;
+                }
+            }else{ //the requested product doesnt even exist in the providers
+                return false;
+            }
         }
-        clientId.push_back(temp);
+    }
+    return true;
+}
 
+void removeFromStock(unordered_map<string,int>& availableStock, vector<int> clientId, vector<Client>& clients){
+    for(int i = 0; i < clientId.size();i++){
+        for(auto& product: clients[clientId[i]].getOrder()){
+            availableStock[product.first] -= product.second;
+        }
     }
 }
 
-void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client>& clients){
-    vector<vector<int>> allClientsCombos = {};
-    int clientLen = 0;
-    int a[1000];
-    for(int i = 0; i < clients.size();i++){
-        a[i] = i;
-        clientLen++;
-    }
-    printPowerSet2(a,clientLen,allClientsCombos);
 
-    double clientWeight = 0;
-    double biggestWeightYet = -1;
-    vector<int> clientsToDeliver;
-    for(DeliveryCar* deliveryCar2: deliveryCars) {
-        clientsToDeliver = {};
-        biggestWeightYet = -1;
-        for (auto &set: allClientsCombos) {
-            clientWeight = 0;
-            for (int client : set) {
-                clientWeight += clients[client].getNumOfProducts();
-            }
-            if (clientWeight <= deliveryCar2->getCapacity() && clientWeight > biggestWeightYet) {
-                biggestWeightYet = clientWeight;
-                clientsToDeliver = set;
-                deliveryCar2->setClientsToDeliverTo(set);
-                deliveryCar2->fillShoppingList(set,clients);
+void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client>& clients, vector<Provider>& providers){
+    vector<int> bestClientCombo = {};
+    vector<int> clientIds;
+    for(int i = 0; i < clients.size();i++){
+        clientIds.push_back(i);
+    }
+    //get the total stock of products the providers have
+    unordered_map<string,int> availableStock;
+    for(auto& provider: providers){
+        for(auto& product: provider.getStock()){
+            if(availableStock.find(product.first) != availableStock.end()){
+                availableStock[product.first] += product.second;
+            }else{
+                availableStock[product.first] = product.second;
             }
         }
+    }
 
-        //"eliminate" the client Combinations that the car is already going to visit
-        auto i = std::begin(allClientsCombos);
-        bool toEliminate = false;
-        while (i != std::end(allClientsCombos)) {
-            // Do some stuff
-            toEliminate = false;
-            for (auto &client: clientsToDeliver) {
-                if (find((*i).begin(), (*i).end(), client) != (*i).end()){
-                    toEliminate = true;
+    vector<int> clientCombo;
+
+    double bestWeight = -1;
+    double currWeight = 0;
+
+    for(DeliveryCar* deliveryCar: deliveryCars){
+        bestClientCombo = {};
+        bestWeight = -1;
+        for(int i = 0; i < clientIds.size();i++) {
+            clientCombo = {};
+            currWeight = 0;
+            clientCombo.push_back(clientIds[i]);
+            currWeight += clients[clientIds[i]].getNumOfProducts();
+            if(currWeight > deliveryCar->getCapacity()){
+                break;
+            }
+            if(check_if_available(availableStock,clientCombo,clients) && clientCombo.size() >= bestClientCombo.size() && currWeight > bestWeight){
+
+                bestClientCombo = clientCombo;
+                bestWeight = currWeight;
+
+            }
+            for(int j = i + 1; j < clientIds.size();j++) {
+                clientCombo.push_back(clientIds[j]);
+                currWeight += clients[clientIds[j]].getNumOfProducts();
+                if(currWeight > deliveryCar->getCapacity()){
                     break;
                 }
+                if(check_if_available(availableStock,clientCombo,clients) && clientCombo.size() >= bestClientCombo.size() && currWeight > bestWeight){
+                    bestClientCombo = clientCombo;
+                    bestWeight = currWeight;
+                }
+
+
             }
-            if(toEliminate){
-                i = allClientsCombos.erase(i);
-            }
-            else
-                ++i;
+
         }
+        //after the best combination is found for one delivery car we need to remove the clients already being serviced
+        for(auto iter = clientIds.begin(); iter != clientIds.end();){
+            auto toRemove = find(bestClientCombo.begin(),bestClientCombo.end(),*iter);
+            if(toRemove != bestClientCombo.end()){
+                iter = clientIds.erase(iter);
+            }else{
+                iter++;
+            }
+        }
+
+        if(bestClientCombo.size() == 0){
+            cout << "No possible delieveries for delivery car number " << deliveryCar->getId() << "\n";
+        }else{
+            removeFromStock(availableStock, bestClientCombo,clients);
+            deliveryCar->setClientsToDeliverTo(bestClientCombo);
+        }
+
     }
+
+    
 }
 
 int main() {
@@ -233,11 +313,11 @@ int main() {
     fill_client_and_provider(clients,providers);
 
     //create delivery cars
-    DeliveryCar deliveryCar("1",3);
-    DeliveryCar deliveryCar1("2", 2);
+    DeliveryCar deliveryCar("1",4);
+    //DeliveryCar deliveryCar1("2", 2);
 
-    vector<DeliveryCar *> deliveryCars = {&deliveryCar,&deliveryCar1};
-
+    vector<DeliveryCar *> deliveryCars = {&deliveryCar};
+    auto start1 = chrono::steady_clock::now();
     //we do a little sorting
     sort(deliveryCars.begin(), deliveryCars.end(), [](const DeliveryCar* d1, const DeliveryCar* d2){
         return d1->getCapacity() < d2->getCapacity();
@@ -246,32 +326,30 @@ int main() {
         return c1.getNumOfProducts() < c2.getNumOfProducts();
     });
 
-    planRouteForCars(deliveryCars,clients);
+    planRouteForCars(deliveryCars,clients,providers);
 
     //makeGraph(graph,clients,providers);
 
-    makeGraph2(graph,clients,providers);
+    //makeGraph2(graph,clients,providers);
 
-    for(DeliveryCar* deliveryCar2: deliveryCars){
-        deliveryCar2->printShoppingList();
-    }
+    makeGraph3(graph,clients,providers);
 
     //next deliveryCar must check what combinations of providers it can go to get the necessary products;
-    auto start1 = chrono::steady_clock::now();
+
     vector<Node> bestPath = deliveryCar.getBestPossiblePath(providers,clients,graph);
-    vector<Node> bestPath2 = deliveryCar1.getBestPossiblePath(providers,clients,graph);
+    //vector<Node> bestPath2 = deliveryCar1.getBestPossiblePath(providers,clients,graph);
     //check which path costs less and its done!
     auto end1 = chrono::steady_clock::now();
     for(Node node: bestPath) {
         cout << node.getId() <<  "-> ";
     }
     cout << "\n";
-
+    /*
     for(Node node: bestPath2) {
         cout << node.getId() <<  "-> ";
     }
     cout << "\n";
-
+    */
     cout << "ran for: " << chrono::duration_cast<chrono::microseconds>(end1 - start1).count() << " micro seconds \n";
     return 0;
 }

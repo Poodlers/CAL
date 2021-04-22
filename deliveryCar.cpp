@@ -35,9 +35,13 @@ void DeliveryCar::printShoppingList() {
 
 bool DeliveryCar::checkIfMeetsRequirement(std::unordered_map<std::string, int> &shoppingList) {
     for(auto& prod: this->shoppingList){
+        if(shoppingList.find(prod.first) == shoppingList.end()){
+            return false;
+        }
         if(prod.second > shoppingList[prod.first]){
             return false;
         }
+
     }
     return true;
 }
@@ -53,26 +57,7 @@ void DeliveryCar::fillShoppingList(std::vector<int> clientIds, std::vector<Clien
     }
 }
 
-void printPowerSet(int set[], int set_size, vector<vector<int>>& providerId)
-{
-    /*set_size of power set of a set with set_size
-    n is (2**n -1)*/
-    unsigned int pow_set_size = pow(2, set_size);
-    int counter, j;
-    vector<int> temp;
-    /*Run from counter 000..0 to 111..1*/
-    for(counter = 0; counter < pow_set_size; counter++)
-    {
-        temp = {};
-        for(j = 0; j < set_size; j++)
-        {
-            if(counter & (1 << j))
-                temp.push_back(set[j]);
-        }
-        providerId.push_back(temp);
 
-    }
-}
 
 bool DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider> providers,
                                       std::vector<std::vector<int>> &viableRoute){
@@ -137,10 +122,56 @@ void DeliveryCar::checkProviderCombinations(int set_size, std::vector<std::vecto
     }
 }
 
+Provider* checkIfProvider(std::vector<Provider> &providers, int id){
+    for(int i = 0; i < providers.size(); i++){
+        if(providers[i].getId() == to_string(id)){
+            return &providers[i];
+        }
+    }
+    return nullptr;
+}
+Client* checkIfClient(std::vector<Client> &clients, int id){
+    for(int i = 0; i < clients.size(); i++){
+        if(clients[i].getId() == to_string(id)){
+            return &clients[i];
+        }
+    }
+    return nullptr;
+}
+
+void DeliveryCar::loadCar(std::unordered_map<std::string, int> &carStock,
+                          std::unordered_map<std::string, int> &stockToLoad) {
+    for(auto& prod: stockToLoad){
+        if(this->shoppingList.find(prod.first) == this->shoppingList.end()){
+            continue; //this product is not in the shoppingList for this car and can be ignored
+        }else{
+            if(stockToLoad[prod.first] >= shoppingList[prod.first]){ //provider has more than what the car needs
+                carStock[prod.first] = shoppingList[prod.first]; //load the required for what the car needs
+            }else{
+                carStock[prod.first] = stockToLoad[prod.first]; // load all this provider can afford to give
+            }
+        }
+    }
+}
+
+bool unloadCar(std::unordered_map<std::string, int> &carStock,Client* client){
+    unordered_map<string,int> shoppingListClient = client->getOrder();
+    for(auto& prod: shoppingListClient){
+        if(carStock.find(prod.first) == carStock.end()){ //this product does not even exist in the car stock
+            return false;
+        }
+        if(prod.second > carStock[prod.first]){ //the client needs more of this product than the car has in stock
+            return false;
+        }
+
+    }
+    return true;
+}
+
 vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
                                               std::vector<Client> &clients, Graph<Node> &graph)  {
 
-    //fillShoppingList(clientsToDeliverTo, clients);
+    fillShoppingList(clientsToDeliverTo, clients);
     vector<vector<int>> viableRoutes;
     checkProviderCombinations(providers.size(), viableRoutes,providers);
 
@@ -157,21 +188,19 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
     //now we have all of the possible providers our car could visit (in every possible order)
 
     //now we can get all the possible permutations on how to visit our clients!
-    double bestClientCost = 99999;
+
     vector<Node> bestRoute;
-    /*
-    for(auto& clientCombos: clientIds){
-     */
+
     vector<int> clientIds = clientsToDeliverTo;
     vector<vector<Node>> allPathsToSearch;
     vector<vector<int>> allClientPerms;
     findPermutations(clientIds,allClientPerms);
-    //display2Dvec(allClientPerms);
+
 
     vector<Node> Path;
     vector<Node> provPath;
     for(auto& provPerm: allProviderPerms){
-        provPath = {graph.getOriginNode()}; //source node of the company
+        provPath = {}; //source node of the company
         for(auto& prov: provPerm) {
             provPath.push_back(providers[prov]);
         }
@@ -184,12 +213,61 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
         }
     }
 
+    //GENERATE ALL PERMUTATIONS
+    vector<vector<Node>> finalPermsToSearch;
+    vector<int> pathInt;
+    vector<vector<int>> allPossiblePerms;
+    for(auto& pathToSearch: allPathsToSearch){
+        pathInt = {};
+        allPossiblePerms = {};
+        for(int i = 0; i < pathToSearch.size(); i++){
+            pathInt.push_back(stoi(pathToSearch[i].getId()));
+        }
+        findPermutations(pathInt, allPossiblePerms);
+
+        //now, trim all stupid Permutations
+        unordered_map<string,int> stockSoFar; //will represent the stock the car is currently holding
+        bool skipped = false;
+        for(auto iter = allPossiblePerms.begin(); iter != allPossiblePerms.end();){
+            stockSoFar.clear();
+            skipped = false;
+            for(auto& nodeId: *iter){
+                Provider* provider = checkIfProvider(providers,nodeId);
+                Client* client = checkIfClient(clients,nodeId);
+                if(provider != nullptr){ //load the car
+                    loadCar(stockSoFar,provider->getStock());
+                }else if(client != nullptr){ //unload the car
+                    if(!unloadCar(stockSoFar,client)){
+                        iter = allPossiblePerms.erase(iter);
+                        skipped = true;
+                        break;
+                    }
+                }
+            }
+            if(!skipped) iter++;
+        }
+
+        for(auto& possiblePerm: allPossiblePerms){
+            Path = {graph.getOriginNode()};
+            for(auto& nodeId: possiblePerm){
+                Provider* provider = checkIfProvider(providers,nodeId);
+                Client* client = checkIfClient(clients,nodeId);
+                if(provider != nullptr){
+                    Path.push_back(*provider);
+                }else{
+                    Path.push_back(*client);
+                }
+            }
+            finalPermsToSearch.push_back(Path);
+        }
+    }
+
     vector<Node> intermediatePaths;
     vector<Node> best;
     vector<Node> currPath;
     double bestCost = 99999;
     double costToTravel;
-    for(auto& path1: allPathsToSearch){
+    for(auto& path1: finalPermsToSearch){
         currPath = {};
         costToTravel = 0;
         for(int i = 0; i < path1.size(); i++){
@@ -210,6 +288,7 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
             }
 
         }
+
         if(costToTravel < bestCost){
             bestCost = costToTravel;
             best = currPath;
@@ -223,4 +302,8 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
 
 int DeliveryCar::getCapacity() const {
     return capacity;
+}
+
+const string &DeliveryCar::getId() const {
+    return id;
 }

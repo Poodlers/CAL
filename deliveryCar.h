@@ -30,6 +30,9 @@ public:
     void setClientsToDeliverTo(std::vector<int> clients);
     void checkProviderCombinations(int set_size, std::vector<std::vector<int>>& providerId, std::vector<Provider>& providers);
     int getCapacity() const;
+    void loadCar(std::unordered_map<std::string, int>& carStock, std::unordered_map<std::string, int>& stockToLoad );
+
+    const std::string &getId() const;
 };
 
 #endif //CAL_MP1_ALGO_CAR_H

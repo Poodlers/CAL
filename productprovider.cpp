@@ -14,7 +14,7 @@ bool Provider::addProduct(std::string productName, int stock) {
     }
 }
 
-const std::unordered_map<std::string, int> &Provider::getStock() const {
+std::unordered_map<std::string, int> &Provider::getStock()  {
     return stock;
 }
 
