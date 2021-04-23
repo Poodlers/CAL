@@ -15,6 +15,7 @@ public:
     bool operator==(const Node& node) const;
     bool operator!=(const Node& node) const;
     std::unordered_map<std::string, int> &getStock();
+    bool removeProduct(std::string productName, int stock);
 
 };
 

@@ -59,7 +59,7 @@ void DeliveryCar::fillShoppingList(std::vector<int> clientIds, std::vector<Clien
 
 
 
-bool DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider> providers,
+bool DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider *> providers,
                                       std::vector<std::vector<int>> &viableRoute){
     unordered_map<string,int> availableStock;
     Provider* currProvider;
@@ -68,7 +68,7 @@ bool DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider> 
         return false;
     }
     for( int i = 0 ; i < a.size() ; ++i ){
-        currProvider = &providers[a[i]];
+        currProvider = providers[a[i]];
         possibleRoute.push_back(a[i]);
         for(auto& product: currProvider->getStock()){
             if(availableStock.find(product.first) != availableStock.end()){
@@ -102,7 +102,7 @@ void DeliveryCar::setClientsToDeliverTo(std::vector<int> clients) {
 }
 
 void DeliveryCar::checkProviderCombinations(int set_size, std::vector<std::vector<int>> &providerId,
-                                            std::vector<Provider> &providers){
+                                            std::vector<Provider *> &providers){
     vector<int> combination;
     for(int i = 0; i < set_size;i++){
         combination = {};
@@ -122,10 +122,10 @@ void DeliveryCar::checkProviderCombinations(int set_size, std::vector<std::vecto
     }
 }
 
-Provider* checkIfProvider(std::vector<Provider> &providers, int id){
+Provider* checkIfProvider(std::vector<Provider *> &providers, int id){
     for(int i = 0; i < providers.size(); i++){
-        if(providers[i].getId() == to_string(id)){
-            return &providers[i];
+        if(providers[i]->getId() == to_string(id)){
+            return providers[i];
         }
     }
     return nullptr;
@@ -168,7 +168,7 @@ bool unloadCar(std::unordered_map<std::string, int> &carStock,Client* client){
     return true;
 }
 
-vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
+pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider *> &providers,
                                               std::vector<Client> &clients, Graph<Node> &graph)  {
 
     fillShoppingList(clientsToDeliverTo, clients);
@@ -179,10 +179,12 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
 
     //display2Dvec(viableRoutes);
 
+    /*
     vector<vector<int>> allProviderPerms;
     for(auto& route: viableRoutes){
         findPermutations(route,allProviderPerms);
     }
+     */
     //display2Dvec(allProviderPerms);
 
     //now we have all of the possible providers our car could visit (in every possible order)
@@ -193,24 +195,19 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
 
     vector<int> clientIds = clientsToDeliverTo;
     vector<vector<Node>> allPathsToSearch;
-    vector<vector<int>> allClientPerms;
-    findPermutations(clientIds,allClientPerms);
-
 
     vector<Node> Path;
     vector<Node> provPath;
-    for(auto& provPerm: allProviderPerms){
-        provPath = {}; //source node of the company
+    for(auto& provPerm: viableRoutes){
+        Path = {}; //source node of the company
         for(auto& prov: provPerm) {
-            provPath.push_back(providers[prov]);
+            Path.push_back(*providers[prov]);
         }
-        for(auto& clientPerm: allClientPerms){
-            Path = provPath;
-            for(auto& client: clientPerm){
-                Path.push_back(clients[client]);
-            }
-            allPathsToSearch.push_back(Path);
+        for(auto& client: clientIds) {
+
+            Path.push_back(clients[client]);
         }
+        allPathsToSearch.push_back(Path);
     }
 
     //GENERATE ALL PERMUTATIONS
@@ -296,7 +293,7 @@ vector<Node> DeliveryCar::getBestPossiblePath(std::vector<Provider> &providers,
         }
     }
 
-    return best;
+    return make_pair(best,bestCost);
 
 }
 
@@ -306,4 +303,16 @@ int DeliveryCar::getCapacity() const {
 
 const string &DeliveryCar::getId() const {
     return id;
+}
+
+unordered_map<std::string, int> DeliveryCar::getShoppingList() const {
+    return shoppingList;
+}
+
+void DeliveryCar::setNodesTravelled(const vector<Node> &nodesTravelled) {
+    DeliveryCar::nodesTravelled = nodesTravelled;
+}
+
+const vector<Node> &DeliveryCar::getNodesTravelled() const {
+    return nodesTravelled;
 }

@@ -25,14 +25,20 @@ public:
     void printShoppingList();
     bool checkIfMeetsRequirement(std::unordered_map<std::string, int>& shoppingList);
     void fillShoppingList(std::vector<int> clientIds, std::vector<Client> clients);
-    std::vector<Node> getBestPossiblePath(std::vector<Provider>& providers, std::vector<Client>& clients, Graph<Node>& graph);
-    bool check_if_perm_works( std::vector<int> a, std::vector<Provider> providers, std::vector<std::vector<int>>& viableRoute );
+    std::pair<std::vector<Node>, double> getBestPossiblePath(std::vector<Provider *>& providers, std::vector<Client>& clients, Graph<Node>& graph);
+    bool check_if_perm_works( std::vector<int> a, std::vector<Provider *> providers, std::vector<std::vector<int>>& viableRoute );
     void setClientsToDeliverTo(std::vector<int> clients);
-    void checkProviderCombinations(int set_size, std::vector<std::vector<int>>& providerId, std::vector<Provider>& providers);
+    void checkProviderCombinations(int set_size, std::vector<std::vector<int>>& providerId, std::vector<Provider *>& providers);
     int getCapacity() const;
     void loadCar(std::unordered_map<std::string, int>& carStock, std::unordered_map<std::string, int>& stockToLoad );
 
     const std::string &getId() const;
+
+    std::unordered_map<std::string, int> getShoppingList() const;
+
+    void setNodesTravelled(const std::vector<Node> &nodesTravelled);
+
+    const std::vector<Node> &getNodesTravelled() const;
 };
 
 #endif //CAL_MP1_ALGO_CAR_H

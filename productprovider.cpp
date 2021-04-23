@@ -1,6 +1,6 @@
 #include "productprovider.h"
 
-std::string Provider::getTypeOfNode() {
+std::string Provider::getTypeOfNode()  {
     return "Provider";
 }
 
@@ -12,6 +12,12 @@ bool Provider::addProduct(std::string productName, int stock) {
     }else{
         this->stock[productName] = stock;
     }
+    return true;
+}
+
+bool Provider::removeProduct(std::string productName, int stock) {
+    this->stock[productName] -= stock;
+    return true;
 }
 
 std::unordered_map<std::string, int> &Provider::getStock()  {
