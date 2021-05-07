@@ -6,6 +6,10 @@ std::string Provider::getTypeOfNode()  {
 
 Provider::Provider(std::string id):Node(id) {};
 
+Provider::Provider(std::string id, double lat, double lng, std::unordered_map<std::string, int> &stock) : Node(id, lat, lng) {
+    this->stock = stock;
+}
+
 bool Provider::addProduct(std::string productName, int stock) {
     if(this->stock.find(productName) != this->stock.end()){
         this->stock[productName] = this->stock[productName] + stock;

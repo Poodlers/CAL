@@ -10,6 +10,7 @@ private:
     std::unordered_map<std::string, int> stock;
 public:
     Provider(std::string id);
+    Provider(std::string id, double lat, double lng, std::unordered_map<std::string, int>& stock);
     std::string getTypeOfNode() override;
     bool addProduct(std::string productName, int stock);
     bool operator==(const Node& node) const;

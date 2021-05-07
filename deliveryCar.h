@@ -24,8 +24,8 @@ public:
     bool addToShoppingList(std::string ProductName, int amount);
     void printShoppingList();
     bool checkIfMeetsRequirement(std::unordered_map<std::string, int>& shoppingList);
-    void fillShoppingList(std::vector<int> clientIds, std::vector<Client> clients);
-    std::pair<std::vector<Node>, double> getBestPossiblePath(std::vector<Provider *>& providers, std::vector<Client>& clients, Graph<Node>& graph);
+    void fillShoppingList(std::vector<int> clientIds, std::vector<Client*> clients);
+    std::pair<std::vector<Node>, double> getBestPossiblePath(std::vector<Provider *>& providers, std::vector<Client*>& clients, Graph<Node>& graph);
     bool check_if_perm_works( std::vector<int> a, std::vector<Provider *> providers, std::vector<std::vector<int>>& viableRoute );
     void setClientsToDeliverTo(std::vector<int> clients);
     void checkProviderCombinations(int set_size, std::vector<std::vector<int>>& providerId, std::vector<Provider *>& providers);

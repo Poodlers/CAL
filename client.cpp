@@ -6,6 +6,10 @@ std::string Client::getTypeOfNode() {
 
 Client::Client(std::string id) : Node(id) {};
 
+Client::Client(std::string id, double lat, double lng, std::unordered_map<std::string, int>& order) : Node(id, lat,lng) {
+    this->order = order;
+}
+
 bool Client::addOrder(std::string productName, int stock) {
     if(this->order.find(productName) != this->order.end()){
         this->order[productName] = this->order[productName] + stock;
@@ -14,7 +18,7 @@ bool Client::addOrder(std::string productName, int stock) {
     }
 }
 
-std::unordered_map<std::string, int> Client::getOrder() {
+std::unordered_map<std::string, int>& Client::getOrder() {
     return this->order;
 }
 bool Client::operator!=(const Node &node) const {

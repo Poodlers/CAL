@@ -7,6 +7,7 @@ DeliveryCar::DeliveryCar(std::string id, int capacity) {
     this->capacity = capacity;
 }
 
+
 bool DeliveryCar::addNodeTravelled(Node node) {
     this->nodesTravelled.push_back(node);
     return true;
@@ -46,11 +47,11 @@ bool DeliveryCar::checkIfMeetsRequirement(std::unordered_map<std::string, int> &
     return true;
 }
 
-void DeliveryCar::fillShoppingList(std::vector<int> clientIds, std::vector<Client> clients) {
+void DeliveryCar::fillShoppingList(std::vector<int> clientIds, std::vector<Client*> clients) {
     this->shoppingList.clear();
     std::unordered_map<std::string,int> clientOrder;
     for(int clientId: clientIds){
-        clientOrder = clients[clientId].getOrder();
+        clientOrder = clients[clientId]->getOrder();
         for(auto& order: clientOrder){
             addToShoppingList(order.first,order.second);
         }
@@ -130,10 +131,10 @@ Provider* checkIfProvider(std::vector<Provider *> &providers, int id){
     }
     return nullptr;
 }
-Client* checkIfClient(std::vector<Client> &clients, int id){
+Client* checkIfClient(std::vector<Client*> &clients, int id){
     for(int i = 0; i < clients.size(); i++){
-        if(clients[i].getId() == to_string(id)){
-            return &clients[i];
+        if(clients[i]->getId() == to_string(id)){
+            return clients[i];
         }
     }
     return nullptr;
@@ -169,7 +170,7 @@ bool unloadCar(std::unordered_map<std::string, int> &carStock,Client* client){
 }
 
 pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider *> &providers,
-                                              std::vector<Client> &clients, Graph<Node> &graph)  {
+                                              std::vector<Client*> &clients, Graph<Node> &graph)  {
 
     fillShoppingList(clientsToDeliverTo, clients);
     vector<vector<int>> viableRoutes;
@@ -205,7 +206,7 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
         }
         for(auto& client: clientIds) {
 
-            Path.push_back(clients[client]);
+            Path.push_back(*clients[client]);
         }
         allPathsToSearch.push_back(Path);
     }

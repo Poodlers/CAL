@@ -107,6 +107,12 @@
 		<Unit filename="C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/productprovider.h">
 			<Option target="CAL_MP1_ALGO"/>
 		</Unit>
+		<Unit filename="C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/utils.cpp">
+			<Option target="CAL_MP1_ALGO"/>
+		</Unit>
+		<Unit filename="C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/utils.h">
+			<Option target="CAL_MP1_ALGO"/>
+		</Unit>
 		<Unit filename="C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
