@@ -528,3 +528,83 @@ Parsed CXX implicit link information from above output:
   implicit fwks: []
 
 
+Determining if the include file sys/types.h exists passed with the following output:
+Change Dir: C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe cmTC_8d589/fast && C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe  -f CMakeFiles\cmTC_8d589.dir\build.make CMakeFiles/cmTC_8d589.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_8d589.dir/CheckIncludeFile.c.obj
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe    -o CMakeFiles\cmTC_8d589.dir\CheckIncludeFile.c.obj   -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c"
+Linking C executable cmTC_8d589.exe
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_8d589.dir\link.txt --verbose=1
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_8d589.dir/objects.a
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe cr CMakeFiles\cmTC_8d589.dir/objects.a @CMakeFiles\cmTC_8d589.dir\objects1.rsp
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe      -Wl,--whole-archive CMakeFiles\cmTC_8d589.dir/objects.a -Wl,--no-whole-archive  -o cmTC_8d589.exe -Wl,--out-implib,libcmTC_8d589.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\cmTC_8d589.dir\linklibs.rsp
+mingw32-make.exe[1]: Leaving directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file stdint.h exists passed with the following output:
+Change Dir: C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe cmTC_ccb5c/fast && C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe  -f CMakeFiles\cmTC_ccb5c.dir\build.make CMakeFiles/cmTC_ccb5c.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_ccb5c.dir/CheckIncludeFile.c.obj
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe    -o CMakeFiles\cmTC_ccb5c.dir\CheckIncludeFile.c.obj   -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c"
+Linking C executable cmTC_ccb5c.exe
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_ccb5c.dir\link.txt --verbose=1
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_ccb5c.dir/objects.a
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe cr CMakeFiles\cmTC_ccb5c.dir/objects.a @CMakeFiles\cmTC_ccb5c.dir\objects1.rsp
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe      -Wl,--whole-archive CMakeFiles\cmTC_ccb5c.dir/objects.a -Wl,--no-whole-archive  -o cmTC_ccb5c.exe -Wl,--out-implib,libcmTC_ccb5c.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\cmTC_ccb5c.dir\linklibs.rsp
+mingw32-make.exe[1]: Leaving directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file stddef.h exists passed with the following output:
+Change Dir: C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe cmTC_c232e/fast && C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe  -f CMakeFiles\cmTC_c232e.dir\build.make CMakeFiles/cmTC_c232e.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c232e.dir/CheckIncludeFile.c.obj
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe    -o CMakeFiles\cmTC_c232e.dir\CheckIncludeFile.c.obj   -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c"
+Linking C executable cmTC_c232e.exe
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_c232e.dir\link.txt --verbose=1
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_c232e.dir/objects.a
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe cr CMakeFiles\cmTC_c232e.dir/objects.a @CMakeFiles\cmTC_c232e.dir\objects1.rsp
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe      -Wl,--whole-archive CMakeFiles\cmTC_c232e.dir/objects.a -Wl,--no-whole-archive  -o cmTC_c232e.exe -Wl,--out-implib,libcmTC_c232e.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\cmTC_c232e.dir\linklibs.rsp
+mingw32-make.exe[1]: Leaving directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+
+
+
+Determining size of void* passed with the following output:
+Change Dir: C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe cmTC_bf09d/fast && C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe  -f CMakeFiles\cmTC_bf09d.dir\build.make CMakeFiles/cmTC_bf09d.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_bf09d.dir/SIZEOF_VOID_PTR.c.obj
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe    -o CMakeFiles\cmTC_bf09d.dir\SIZEOF_VOID_PTR.c.obj   -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles\CheckTypeSize\SIZEOF_VOID_PTR.c"
+Linking C executable cmTC_bf09d.exe
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_bf09d.dir\link.txt --verbose=1
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_bf09d.dir/objects.a
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe cr CMakeFiles\cmTC_bf09d.dir/objects.a @CMakeFiles\cmTC_bf09d.dir\objects1.rsp
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe      -Wl,--whole-archive CMakeFiles\cmTC_bf09d.dir/objects.a -Wl,--no-whole-archive  -o cmTC_bf09d.exe -Wl,--out-implib,libcmTC_bf09d.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\cmTC_bf09d.dir\linklibs.rsp
+mingw32-make.exe[1]: Leaving directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+
+
+
+Determining if the include file dinput.h exists passed with the following output:
+Change Dir: C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe cmTC_68982/fast && C:/PROGRA~1/MINGW-~1/X86_64~1.0-P/mingw64/bin/mingw32-make.exe  -f CMakeFiles\cmTC_68982.dir\build.make CMakeFiles/cmTC_68982.dir/build
+mingw32-make.exe[1]: Entering directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_68982.dir/CheckIncludeFile.c.obj
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe    -o CMakeFiles\cmTC_68982.dir\CheckIncludeFile.c.obj   -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles\CMakeTmp\CheckIncludeFile.c"
+Linking C executable cmTC_68982.exe
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E cmake_link_script CMakeFiles\cmTC_68982.dir\link.txt --verbose=1
+"C:\Program Files\JetBrains\CLion 2020.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\cmTC_68982.dir/objects.a
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe cr CMakeFiles\cmTC_68982.dir/objects.a @CMakeFiles\cmTC_68982.dir\objects1.rsp
+C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe      -Wl,--whole-archive CMakeFiles\cmTC_68982.dir/objects.a -Wl,--no-whole-archive  -o cmTC_68982.exe -Wl,--out-implib,libcmTC_68982.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\cmTC_68982.dir\linklibs.rsp
+mingw32-make.exe[1]: Leaving directory 'C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/CMakeFiles/CMakeTmp'
+
+
+

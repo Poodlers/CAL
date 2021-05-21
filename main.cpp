@@ -1,14 +1,48 @@
 #include <iostream>
 #include <algorithm>
 #include <chrono>
+#include <fstream>
+#include <sstream>
 #include "productprovider.h"
 #include "Graph.h"
 #include "deliveryCar.h"
+#include "graphviewer.h"
 #include "utils.h"
 
 using namespace std;
 
 
+using ViewerNode = GraphViewer::Node;
+using ViewerEdge = GraphViewer::Edge;
+
+GraphViewer gv;
+
+void setupGraphViewer(GraphViewer& gv, std::string x_y_file){
+    ifstream file(x_y_file);
+    gv.setCenter(sf::Vector2f(950, 525));
+
+    // Create window
+    gv.createWindow(1900, 1050);
+
+    string line;
+    std::getline(file, line);
+
+
+    while (std::getline(file, line))
+    {
+        std::istringstream iss(line);
+        int id;
+        double x, y;
+        char delim;
+        if (!(iss >> delim >> id >> delim >> x >> delim >> y  >>delim)) { break; } // error
+        ViewerNode viewerNode = gv.addNode(id, sf::Vector2f(x, y));
+        viewerNode.setColor(GraphViewer::BLUE);
+
+    }
+
+    gv.setBackground("penafiel_strong_component.png");
+    gv.join();
+}
 
 void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client* >& clients, vector<Provider *>& providers, Graph<Node>& graph){
     vector<vector<int>> bestClientCombo = {};
@@ -97,7 +131,7 @@ void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client* >& clie
 int main() {
     Graph<Node> graph;
     //distribute clients to cars
-
+    setupGraphViewer(gv,"penafiel_strong_nodes_xy.txt");
     vector<Client *> clients;
     vector<Provider *> providers;
     //create provider and client information

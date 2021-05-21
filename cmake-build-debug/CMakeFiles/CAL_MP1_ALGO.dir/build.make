@@ -77,6 +77,7 @@ include CMakeFiles/CAL_MP1_ALGO.dir/progress.make
 include CMakeFiles/CAL_MP1_ALGO.dir/flags.make
 
 CMakeFiles/CAL_MP1_ALGO.dir/main.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/flags.make
+CMakeFiles/CAL_MP1_ALGO.dir/main.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/includes_CXX.rsp
 CMakeFiles/CAL_MP1_ALGO.dir/main.cpp.obj: ../main.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/CAL_MP1_ALGO.dir/main.cpp.obj"
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\CAL_MP1_ALGO.dir\main.cpp.obj -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\main.cpp"
@@ -90,6 +91,7 @@ CMakeFiles/CAL_MP1_ALGO.dir/main.cpp.s: cmake_force
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\main.cpp" -o CMakeFiles\CAL_MP1_ALGO.dir\main.cpp.s
 
 CMakeFiles/CAL_MP1_ALGO.dir/client.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/flags.make
+CMakeFiles/CAL_MP1_ALGO.dir/client.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/includes_CXX.rsp
 CMakeFiles/CAL_MP1_ALGO.dir/client.cpp.obj: ../client.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/CAL_MP1_ALGO.dir/client.cpp.obj"
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\CAL_MP1_ALGO.dir\client.cpp.obj -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\client.cpp"
@@ -103,6 +105,7 @@ CMakeFiles/CAL_MP1_ALGO.dir/client.cpp.s: cmake_force
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\client.cpp" -o CMakeFiles\CAL_MP1_ALGO.dir\client.cpp.s
 
 CMakeFiles/CAL_MP1_ALGO.dir/productprovider.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/flags.make
+CMakeFiles/CAL_MP1_ALGO.dir/productprovider.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/includes_CXX.rsp
 CMakeFiles/CAL_MP1_ALGO.dir/productprovider.cpp.obj: ../productprovider.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/CAL_MP1_ALGO.dir/productprovider.cpp.obj"
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\CAL_MP1_ALGO.dir\productprovider.cpp.obj -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\productprovider.cpp"
@@ -116,6 +119,7 @@ CMakeFiles/CAL_MP1_ALGO.dir/productprovider.cpp.s: cmake_force
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\productprovider.cpp" -o CMakeFiles\CAL_MP1_ALGO.dir\productprovider.cpp.s
 
 CMakeFiles/CAL_MP1_ALGO.dir/node.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/flags.make
+CMakeFiles/CAL_MP1_ALGO.dir/node.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/includes_CXX.rsp
 CMakeFiles/CAL_MP1_ALGO.dir/node.cpp.obj: ../node.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/CAL_MP1_ALGO.dir/node.cpp.obj"
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\CAL_MP1_ALGO.dir\node.cpp.obj -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\node.cpp"
@@ -129,6 +133,7 @@ CMakeFiles/CAL_MP1_ALGO.dir/node.cpp.s: cmake_force
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\node.cpp" -o CMakeFiles\CAL_MP1_ALGO.dir\node.cpp.s
 
 CMakeFiles/CAL_MP1_ALGO.dir/deliveryCar.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/flags.make
+CMakeFiles/CAL_MP1_ALGO.dir/deliveryCar.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/includes_CXX.rsp
 CMakeFiles/CAL_MP1_ALGO.dir/deliveryCar.cpp.obj: ../deliveryCar.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/CAL_MP1_ALGO.dir/deliveryCar.cpp.obj"
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\CAL_MP1_ALGO.dir\deliveryCar.cpp.obj -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\deliveryCar.cpp"
@@ -142,6 +147,7 @@ CMakeFiles/CAL_MP1_ALGO.dir/deliveryCar.cpp.s: cmake_force
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\deliveryCar.cpp" -o CMakeFiles\CAL_MP1_ALGO.dir\deliveryCar.cpp.s
 
 CMakeFiles/CAL_MP1_ALGO.dir/utils.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/flags.make
+CMakeFiles/CAL_MP1_ALGO.dir/utils.cpp.obj: CMakeFiles/CAL_MP1_ALGO.dir/includes_CXX.rsp
 CMakeFiles/CAL_MP1_ALGO.dir/utils.cpp.obj: ../utils.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir="C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\cmake-build-debug\CMakeFiles" --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/CAL_MP1_ALGO.dir/utils.cpp.obj"
 	C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\G__~1.EXE  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles\CAL_MP1_ALGO.dir\utils.cpp.obj -c "C:\Users\radio\OneDrive\Ambiente de Trabalho\PwoGwammingUwU\CLion Projects\CAL_MP1_ALGO\utils.cpp"
@@ -173,6 +179,10 @@ CAL_MP1_ALGO.exe: CMakeFiles/CAL_MP1_ALGO.dir/node.cpp.obj
 CAL_MP1_ALGO.exe: CMakeFiles/CAL_MP1_ALGO.dir/deliveryCar.cpp.obj
 CAL_MP1_ALGO.exe: CMakeFiles/CAL_MP1_ALGO.dir/utils.cpp.obj
 CAL_MP1_ALGO.exe: CMakeFiles/CAL_MP1_ALGO.dir/build.make
+CAL_MP1_ALGO.exe: ../lib/GraphViewerCpp/lib/libgraphviewer.a
+CAL_MP1_ALGO.exe: lib/GraphViewerCpp/SFML/lib/libsfml-graphics-d.a
+CAL_MP1_ALGO.exe: lib/GraphViewerCpp/SFML/lib/libsfml-window-d.a
+CAL_MP1_ALGO.exe: lib/GraphViewerCpp/SFML/lib/libsfml-system-d.a
 CAL_MP1_ALGO.exe: CMakeFiles/CAL_MP1_ALGO.dir/linklibs.rsp
 CAL_MP1_ALGO.exe: CMakeFiles/CAL_MP1_ALGO.dir/objects1.rsp
 CAL_MP1_ALGO.exe: CMakeFiles/CAL_MP1_ALGO.dir/link.txt

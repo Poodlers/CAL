@@ -15,10 +15,16 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "../lib/GraphViewerCpp/include"
+  "../lib/GraphViewerCpp/SFML/include"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
+  "C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/lib/GraphViewerCpp/CMakeFiles/graphviewer.dir/DependInfo.cmake"
+  "C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/lib/GraphViewerCpp/SFML/src/SFML/Graphics/CMakeFiles/sfml-graphics.dir/DependInfo.cmake"
+  "C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/lib/GraphViewerCpp/SFML/src/SFML/Window/CMakeFiles/sfml-window.dir/DependInfo.cmake"
+  "C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/cmake-build-debug/lib/GraphViewerCpp/SFML/src/SFML/System/CMakeFiles/sfml-system.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.
