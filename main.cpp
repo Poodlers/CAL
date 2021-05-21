@@ -35,7 +35,7 @@ void setupGraphViewer(GraphViewer& gv, std::string x_y_file){
         double x, y;
         char delim;
         if (!(iss >> delim >> id >> delim >> x >> delim >> y  >>delim)) { break; } // error
-        ViewerNode viewerNode = gv.addNode(id, sf::Vector2f(x, y));
+        ViewerNode viewerNode = gv.addNode(id, sf::Vector2f(50, 50));
         viewerNode.setColor(GraphViewer::BLUE);
 
     }
@@ -132,6 +132,7 @@ int main() {
     Graph<Node> graph;
     //distribute clients to cars
     setupGraphViewer(gv,"penafiel_strong_nodes_xy.txt");
+    /*
     vector<Client *> clients;
     vector<Provider *> providers;
     //create provider and client information
@@ -168,4 +169,5 @@ int main() {
 
     cout << "ran for: " << chrono::duration_cast<chrono::milliseconds >(end1 - start1).count() << " milli seconds \n";
     return 0;
+     */
 }
