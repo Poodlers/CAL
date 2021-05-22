@@ -149,6 +149,68 @@ void fill_client_and_provider(vector<Client* >& clients, vector<Provider *>& pro
     providers = {provider1, provider2,provider3};
 }
 
+void fill_client_and_provider_rand(vector<int> nodeIds, vector<Client* >& clients, vector<Provider *>& providers, int number_clients, int number_providers,vector<string> products){
+    vector<int> usedNodes;
+
+    for (int i = 0; i<number_clients; i++){
+        int node;
+        if (usedNodes.size() == nodeIds.size()){
+            break;
+        }
+        while (true){
+            node = rand() % nodeIds.size();
+            std::vector<int>::iterator it = find(usedNodes.begin(),usedNodes.end(),nodeIds[node]);
+            if (it == usedNodes.end()) break;
+        }
+        usedNodes.push_back(nodeIds[node]);
+        Client* client = new Client(to_string(nodeIds[node]));
+        int num_prod = rand() % products.size();
+        for (int e = 0; e < num_prod; e++){
+            int prod = rand() % products.size();
+            int ammount = rand() % 9 +1;
+            client->addOrder(products[prod],ammount);
+        }
+        clients.push_back(client);
+    }
+
+    for (int i = 0; i<number_providers; i++){
+        int node;
+        if (usedNodes.size() == nodeIds.size()){
+            break;
+        }
+        while (true){
+            node = rand() % nodeIds.size();
+            std::vector<int>::iterator it = find(usedNodes.begin(),usedNodes.end(),nodeIds[node]);
+            if (it == usedNodes.end()) break;
+        }
+        usedNodes.push_back(nodeIds[node]);
+        Provider* provider = new Provider(to_string(nodeIds[node]));
+        int num_prod = rand() % products.size();
+        for (int e = 0; e < num_prod; e++){
+            int prod = rand() % products.size();
+            int ammount = rand() % 9 +1;
+            provider->addProduct(products[prod],ammount);
+        }
+        providers.push_back(provider);
+    }
+}
+
+vector<int> getNodeIds(string nodesTxt){
+    vector<int> nodeIds;
+    ifstream nodes_file(nodesTxt);
+    string line;
+    std::getline(nodes_file, line); //get rid of first line with the number of nodes 
+    while (std::getline(nodes_file, line))
+    {
+        std::istringstream iss(line);
+        int id;
+        char delim;
+        if (!(iss >> delim >> id >> delim)) { break; } // error
+        nodeIds.push_back(id);
+    }
+    return nodeIds;
+}
+
 void makeGraph(Graph<Node>& graph, vector<Client> clients, vector<Provider> providers){
     Node node1("1");
     Node node2("2");

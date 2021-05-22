@@ -12,17 +12,20 @@
 
 using namespace std;
 
-void display2Dvec(vector<vector<int>> a);
-void makeGraph3(Graph<Node>& graph, vector<Client> clients, vector<Provider *> providers);
-void makeGraph2(Graph<Node>& graph, vector<Client> clients, vector<Provider> providers);
-void fill_client_and_provider(vector<Client*>& clients, vector<Provider *>& providers);
-void makeGraph(Graph<Node>& graph, vector<Client> clients, vector<Provider> providers);
-bool check_if_available(unordered_map<string,int> availableStock,vector<int> clientId, vector<Client*>& clients);
-void removeFromStock(unordered_map<string,int>& availableStock, vector<int> clientId, vector<Client*>& clients);
-void handleNewClientCombo(vector<vector<int>>& bestClientCombo, vector<int>& clientCombo, double & bestWeight, double currWeight, unordered_map<string,int>& availableStock, vector<Client* >& clients);
-void removeFromProviders(vector<Provider*>& providers, vector<Node>& path, unordered_map<std::string,int> shoppingList);
-void buildGraphFromTxt(Graph<Node>& graph, string edgesTxt, string nodesTxt, vector<Client* >& clients, vector<Provider*>& providers);
+void display2Dvec(std::vector<vector<int>> a);
+void makeGraph3(Graph<Node>& graph, std::vector<Client> clients, std::vector<Provider *> providers);
+void makeGraph2(Graph<Node>& graph, std::vector<Client> clients, std::vector<Provider> providers);
+void fill_client_and_provider(std::vector<Client*>& clients, std::vector<Provider *>& providers);
+void makeGraph(Graph<Node>& graph, std::vector<Client> clients, std::vector<Provider> providers);
+bool check_if_available(unordered_map<string,int> availableStock, std::vector<int> clientId, std::vector<Client*>& clients);
+void removeFromStock(unordered_map<string,int>& availableStock, std::vector<int> clientId, std::vector<Client*>& clients);
+void handleNewClientCombo(std::vector<std::vector<int>>& bestClientCombo, std::vector<int>& clientCombo, double & bestWeight, double currWeight, unordered_map<string,int>& availableStock, std::vector<Client* >& clients);
+void removeFromProviders(std::vector<Provider*>& providers, std::vector<Node>& path, unordered_map<std::string,int> shoppingList);
+void buildGraphFromTxt(Graph<Node>& graph, string edgesTxt, string nodesTxt, std::vector<Client* >& clients, std::vector<Provider*>& providers);
 double calculate_distance_between_two_nodes(Node node1, Node node2);
+std::vector<int> getNodeIds(string nodesTxt);
+void fill_client_and_provider_rand(std::vector<int> nodeIds, std::vector<Client* >& clients, std::vector<Provider *>& providers, int number_clients, int number_providers, std::vector<string> products){
+
 
 
 #endif //CAL_MP1_ALGO_UTILS_H

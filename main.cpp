@@ -132,11 +132,14 @@ int main() {
     Graph<Node> graph;
     //distribute clients to cars
     setupGraphViewer(gv,"penafiel_strong_nodes_xy.txt");
-    /*
+    
     vector<Client *> clients;
     vector<Provider *> providers;
     //create provider and client information
-    fill_client_and_provider(clients,providers);
+
+    vector<string> products = {"A", "B", "C", "D", "E"};
+
+    fill_client_and_provider_rand(getNodeIds("penafiel_strong_nodes_latlng.txt"),clients,providers,10,3,products);
 
     //create delivery cars
     DeliveryCar deliveryCar("1",4);
@@ -169,5 +172,5 @@ int main() {
 
     cout << "ran for: " << chrono::duration_cast<chrono::milliseconds >(end1 - start1).count() << " milli seconds \n";
     return 0;
-     */
+     
 }
