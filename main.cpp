@@ -12,39 +12,8 @@
 using namespace std;
 
 
-using ViewerNode = GraphViewer::Node;
-using ViewerEdge = GraphViewer::Edge;
 
-GraphViewer gv;
-
-void setupGraphViewer(GraphViewer& gv, std::string x_y_file){
-    ifstream file(x_y_file);
-    gv.setCenter(sf::Vector2f(950, 525));
-
-    // Create window
-    gv.createWindow(1900, 1050);
-
-    string line;
-    std::getline(file, line);
-
-
-    while (std::getline(file, line))
-    {
-        std::istringstream iss(line);
-        int id;
-        double x, y;
-        char delim;
-        if (!(iss >> delim >> id >> delim >> x >> delim >> y  >>delim)) { break; } // error
-        ViewerNode viewerNode = gv.addNode(id, sf::Vector2f(50, 50));
-        viewerNode.setColor(GraphViewer::BLUE);
-
-    }
-
-    gv.setBackground("penafiel_strong_component.png");
-    gv.join();
-}
-
-void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client* >& clients, vector<Provider *>& providers, Graph<Node>& graph){
+void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client* >& clients, vector<Provider *>& providers, Graph<Node>& graph, GraphViewer& gv){
     vector<vector<int>> bestClientCombo = {};
     vector<int> clientIds;
     for(int i = 0; i < clients.size();i++){
@@ -99,7 +68,7 @@ void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client* >& clie
         }else{
             for(auto& combo: bestClientCombo){
                 deliveryCar->setClientsToDeliverTo(combo);
-                bestPath = deliveryCar->getBestPossiblePath(providers,clients,graph);
+                bestPath = deliveryCar->getBestPossiblePath(providers,clients,graph,gv);
                 if(bestPath.second < bestDistance){
                     trueBestClientCombo = combo;
                     bestDistance = bestPath.second;
@@ -131,13 +100,16 @@ void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client* >& clie
 int main() {
     Graph<Node> graph;
     //distribute clients to cars
-    setupGraphViewer(gv,"penafiel_strong_nodes_xy.txt");
-    /*
+
     vector<Client *> clients;
     vector<Provider *> providers;
-    //create provider and client information
-    fill_client_and_provider(clients,providers);
 
+    //create provider and client information
+    vector<string> products = {"A", "B", "C", "D", "E"};
+
+    fill_client_and_provider_rand(getNodeIds("penafiel_strong_nodes_latlng.txt"),clients,providers,10,3,products);
+
+    
     //create delivery cars
     DeliveryCar deliveryCar("1",4);
     //DeliveryCar deliveryCar1("2", 2);
@@ -152,8 +124,11 @@ int main() {
         return c1->getNumOfProducts() < c2->getNumOfProducts();
     });
 
-    buildGraphFromTxt(graph,"penafiel_strong_edges.txt", "penafiel_strong_nodes_latlng.txt",clients,providers);
-    planRouteForCars(deliveryCars,clients,providers,graph);
+    GraphViewer gv;
+    buildGraphFromTxt(gv,graph,"penafiel_strong_edges.txt", "penafiel_strong_nodes_latlng.txt", "penafiel_strong_nodes_xy.txt",clients,providers);
+    planRouteForCars(deliveryCars,clients,providers,graph,gv);
+
+
 
     //next deliveryCar must check what combinations of providers it can go to get the necessary products;
 
@@ -168,6 +143,8 @@ int main() {
     }
 
     cout << "ran for: " << chrono::duration_cast<chrono::milliseconds >(end1 - start1).count() << " milli seconds \n";
+
+
     return 0;
-     */
+
 }

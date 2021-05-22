@@ -1,7 +1,13 @@
 #include "deliveryCar.h"
 #include <iostream>
+#include <Windows.h>
+#include "graphviewer.h"
 
 using namespace std;
+
+using ViewerNode = GraphViewer::Node;
+using ViewerEdge = GraphViewer::Edge;
+
 DeliveryCar::DeliveryCar(std::string id, int capacity) {
     this->id = id;
     this->capacity = capacity;
@@ -170,28 +176,11 @@ bool unloadCar(std::unordered_map<std::string, int> &carStock,Client* client){
 }
 
 pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider *> &providers,
-                                              std::vector<Client*> &clients, Graph<Node> &graph)  {
+                                              std::vector<Client*> &clients, Graph<Node> &graph, GraphViewer& gv)  {
 
     fillShoppingList(clientsToDeliverTo, clients);
     vector<vector<int>> viableRoutes;
     checkProviderCombinations(providers.size(), viableRoutes,providers);
-
-    //esta parte do código usa powerset like a boss mas dá para faze-lo com uma sliding window technique porvavelmente
-
-    //display2Dvec(viableRoutes);
-
-    /*
-    vector<vector<int>> allProviderPerms;
-    for(auto& route: viableRoutes){
-        findPermutations(route,allProviderPerms);
-    }
-     */
-    //display2Dvec(allProviderPerms);
-
-    //now we have all of the possible providers our car could visit (in every possible order)
-
-    //now we can get all the possible permutations on how to visit our clients!
-
     vector<Node> bestRoute;
 
     vector<int> clientIds = clientsToDeliverTo;
@@ -265,6 +254,12 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
     vector<Node> currPath;
     double bestCost = 99999;
     double costToTravel;
+
+
+    gv.setCenter(sf::Vector2f(-100, -100));
+    gv.createWindow(1800, 1050);
+
+
     for(auto& path1: finalPermsToSearch){
         currPath = {};
         costToTravel = 0;
@@ -280,6 +275,33 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
                         Vertex<Node>* nextVertex = graph.findVertex(intermediatePaths[c + 1]);
                         Vertex<Node>* currVertex = graph.findVertex(intermediatePaths[c]);
                         costToTravel += currVertex->getEdgeDistance(nextVertex);
+
+                        gv.lock();
+                        ViewerNode& node0 = gv.getNode(stoi(currVertex->getInfo().getId()));
+
+                        if(currVertex->getInfo().getTypeOfNode() != "Client" && currVertex->getInfo().getTypeOfNode() != "Provider"
+                        && currVertex->getInfo() != graph.getOriginNode())
+                            node0.setColor(GraphViewer::YELLOW);
+
+                        ViewerNode& node1 = gv.getNode(stoi(nextVertex->getInfo().getId()));
+                        if(nextVertex->getInfo().getTypeOfNode() != "Client" && nextVertex->getInfo().getTypeOfNode() != "Provider"
+                        && nextVertex->getInfo() != graph.getOriginNode())
+                            node1.setColor(GraphViewer::PINK);
+
+                        ViewerEdge& edge = gv.getEdge(currVertex->getEdge(nextVertex).getId());
+                        ViewerEdge& edge2 = gv.getEdge(nextVertex->getEdge(currVertex).getId());
+                        if(edge.getColor() == GraphViewer::GREEN){
+                            edge.setColor(GraphViewer::RED);
+                            edge2.setColor(GraphViewer::RED);
+                        }else{
+                            edge.setColor(GraphViewer::GREEN);
+                            edge2.setColor(GraphViewer::GREEN);
+                        }
+
+
+                        gv.unlock();
+                        Sleep(100);
+
                     }
 
                 }
@@ -293,7 +315,7 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
 
         }
     }
-
+    gv.join();
     return make_pair(best,bestCost);
 
 }

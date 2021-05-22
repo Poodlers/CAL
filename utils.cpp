@@ -2,6 +2,12 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include "graphviewer.h"
+
+using namespace std;
+
+using ViewerNode = GraphViewer::Node;
+using ViewerEdge = GraphViewer::Edge;
 
 void display2Dvec(vector<vector<int>> a)
 {
@@ -13,6 +19,7 @@ void display2Dvec(vector<vector<int>> a)
     }
 }
 
+/*
 void makeGraph3(Graph<Node>& graph, vector<Client> clients, vector<Provider *> providers){
     Node node1("1");
     graph.addVertex(node1);
@@ -130,6 +137,7 @@ void makeGraph2(Graph<Node>& graph, vector<Client> clients, vector<Provider> pro
     graph.addEdge(providers[1],providers[2],1);
 
 }
+ */
 
 void fill_client_and_provider(vector<Client* >& clients, vector<Provider *>& providers){
     Client* client1 = new Client("7100");
@@ -149,6 +157,7 @@ void fill_client_and_provider(vector<Client* >& clients, vector<Provider *>& pro
     providers = {provider1, provider2,provider3};
 }
 
+/*
 void makeGraph(Graph<Node>& graph, vector<Client> clients, vector<Provider> providers){
     Node node1("1");
     Node node2("2");
@@ -195,6 +204,8 @@ void makeGraph(Graph<Node>& graph, vector<Client> clients, vector<Provider> prov
     graph.addEdge(clients[1],providers[2],1);
 
 }
+
+ */
 
 bool check_if_available(unordered_map<string,int> availableStock,vector<int> clientId, vector<Client*>& clients){
     for(int i = 0; i < clientId.size();i++){
@@ -296,26 +307,37 @@ double calculate_distance_between_two_nodes(Node node1, Node node2){
     return R * c; // in metres
 }
 
-void buildGraphFromTxt(Graph<Node>& graph, string edgesTxt, string nodesTxt, vector<Client* >& clients, vector<Provider*>& providers){
+void buildGraphFromTxt(GraphViewer& gv, Graph<Node>& graph, string edgesTxt, string nodesTxt, string nodesXY, vector<Client* >& clients, vector<Provider*>& providers){
+
     ifstream edge_file(edgesTxt);
     ifstream nodes_file(nodesTxt);
+    ifstream nodes_file_xy(nodesXY);
     string line;
+    string line2;
     std::getline(nodes_file, line);
+    std::getline(nodes_file_xy, line);
     int num_of_nodes = stoi(line);
     graph.setOriginNode(5);
+
     while (std::getline(nodes_file, line))
     {
         std::istringstream iss(line);
         int id;
-        double lat, lng;
+        double lat, lng, x,y;
         char delim;
+        std::getline(nodes_file_xy, line2);
+        std::istringstream iss2(line2);
+        if (!(iss2 >> delim >> id >> delim >> x >> delim >> y  >>delim)) { break; } // error
         if (!(iss >> delim >> id >> delim >> lat >> delim >> lng  >>delim)) { break; } // error
-        Node* node = new Node(to_string(id), lat, lng);
+        Node* node = new Node(to_string(id), lat, lng,x,y);
+        ViewerNode& node0 = gv.addNode(id,sf::Vector2f(x, y));
+        node0.setColor(GraphViewer::BLUE);
         for(Client* client1: clients){
             if(*node == *client1){
                 client1->setLat(lat);
                 client1->setLng(lng);
-                node = new Client(to_string(id), lat, lng, client1->getOrder());
+                node = new Client(to_string(id), lat, lng,x,y, client1->getOrder());
+                node0.setColor(GraphViewer::RED);
                 break;
             }
         }
@@ -323,7 +345,8 @@ void buildGraphFromTxt(Graph<Node>& graph, string edgesTxt, string nodesTxt, vec
             if(*node == *provider){
                 provider->setLng(lng);
                 provider->setLat(lat);
-                node = new Provider(to_string(id), lat,lng, provider->getStock());
+                node = new Provider(to_string(id), lat,lng,x,y,provider->getStock());
+                node0.setColor(GraphViewer::GREEN);
                 break;
             }
         }
@@ -335,6 +358,8 @@ void buildGraphFromTxt(Graph<Node>& graph, string edgesTxt, string nodesTxt, vec
 
     std::getline(edge_file, line);
     int num_of_edges = stoi(line);
+    int edgeID = 0;
+
     while (std::getline(edge_file, line))
     {
         std::istringstream iss(line);
@@ -345,11 +370,81 @@ void buildGraphFromTxt(Graph<Node>& graph, string edgesTxt, string nodesTxt, vec
         Node node4(to_string(node2));
         Vertex<Node>* v1 = graph.findVertex(node3);
         Vertex<Node>* v2 = graph.findVertex(node4);
+        ViewerNode& nodeInitial = gv.getNode(stoi(node3.getId()));
+        ViewerNode& nodeFinal = gv.getNode(stoi(node4.getId()));
         double distance = calculate_distance_between_two_nodes(v1->getInfo(), v2->getInfo());
-        graph.addEdge(v1->getInfo(), v2->getInfo(), distance);
-        graph.addEdge(v2->getInfo(), v1->getInfo(),distance);
+        graph.addEdge(edgeID, v1->getInfo(), v2->getInfo(), distance);
+        gv.addEdge(edgeID,nodeInitial, nodeFinal, GraphViewer::Edge::UNDIRECTED);
+        edgeID++;
+        graph.addEdge(edgeID,v2->getInfo(), v1->getInfo(),distance);
+        gv.addEdge(edgeID,nodeFinal, nodeInitial, GraphViewer::Edge::UNDIRECTED);
+        edgeID++;
         // process  (id, lat, lng)
     }
 
+    ViewerNode& origin = gv.getNode(stoi(graph.getOriginNode().getId()));
+    origin.setColor(GraphViewer::MAGENTA);
 
+}
+
+void fill_client_and_provider_rand(vector<int> nodeIds, vector<Client* >& clients, vector<Provider *>& providers, int number_clients, int number_providers,vector<string> products){
+    vector<int> usedNodes;
+
+    for (int i = 0; i<number_clients; i++){
+        int node;
+        if (usedNodes.size() == nodeIds.size()){
+            break;
+        }
+        while (true){
+            node = rand() % nodeIds.size();
+            std::vector<int>::iterator it = find(usedNodes.begin(),usedNodes.end(),nodeIds[node]);
+            if (it == usedNodes.end()) break;
+        }
+        usedNodes.push_back(nodeIds[node]);
+        Client* client = new Client(to_string(nodeIds[node]));
+        int num_prod = rand() % products.size();
+        for (int e = 0; e < num_prod; e++){
+            int prod = rand() % products.size();
+            int ammount = rand() % 9 +1;
+            client->addOrder(products[prod],ammount);
+        }
+        clients.push_back(client);
+    }
+
+    for (int i = 0; i<number_providers; i++){
+        int node;
+        if (usedNodes.size() == nodeIds.size()){
+            break;
+        }
+        while (true){
+            node = rand() % nodeIds.size();
+            std::vector<int>::iterator it = find(usedNodes.begin(),usedNodes.end(),nodeIds[node]);
+            if (it == usedNodes.end()) break;
+        }
+        usedNodes.push_back(nodeIds[node]);
+        Provider* provider = new Provider(to_string(nodeIds[node]));
+        int num_prod = rand() % products.size();
+        for (int e = 0; e < num_prod; e++){
+            int prod = rand() % products.size();
+            int ammount = rand() % 9 +1;
+            provider->addProduct(products[prod],ammount);
+        }
+        providers.push_back(provider);
+    }
+}
+
+vector<int> getNodeIds(string nodesTxt){
+    vector<int> nodeIds;
+    ifstream nodes_file(nodesTxt);
+    string line;
+    std::getline(nodes_file, line); //get rid of first line with the number of nodes
+    while (std::getline(nodes_file, line))
+    {
+        std::istringstream iss(line);
+        int id;
+        char delim;
+        if (!(iss >> delim >> id >> delim)) { break; } // error
+        nodeIds.push_back(id);
+    }
+    return nodeIds;
 }

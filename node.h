@@ -9,10 +9,12 @@ private:
     std::string id;
     double lat;
     double lng;
+    double x;
+    double y;
 public:
     Node(std::string id);
 
-    Node(const std::string &id, double lat, double lng);
+    Node(const std::string &id, double lat, double lng, double x, double y);
 
     virtual std::string getTypeOfNode();
     std::string getId() const;
@@ -26,6 +28,14 @@ public:
     double getLng() const;
 
     void setLng(double lng);
+
+    double getX() const;
+
+    void setX(double x);
+
+    double getY() const;
+
+    void setY(double y);
 };
 
 #endif //CAL_MP1_ALGO_BASICNODE_H

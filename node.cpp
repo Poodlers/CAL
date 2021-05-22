@@ -36,4 +36,20 @@ void Node::setLng(double lng) {
     Node::lng = lng;
 }
 
-Node::Node(const std::string &id, double lat, double lng) : id(id), lat(lat), lng(lng) {}
+Node::Node(const std::string &id, double lat, double lng, double x, double y) : id(id), lat(lat), lng(lng), x(x), y(y) {}
+
+double Node::getX() const {
+    return x;
+}
+
+void Node::setX(double x) {
+    Node::x = x;
+}
+
+double Node::getY() const {
+    return y;
+}
+
+void Node::setY(double y) {
+    Node::y = y;
+}

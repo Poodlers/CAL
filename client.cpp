@@ -6,7 +6,7 @@ std::string Client::getTypeOfNode() {
 
 Client::Client(std::string id) : Node(id) {};
 
-Client::Client(std::string id, double lat, double lng, std::unordered_map<std::string, int>& order) : Node(id, lat,lng) {
+Client::Client(std::string id, double lat, double lng, double x, double y, std::unordered_map<std::string, int>& order) : Node(id, lat,lng,x,y) {
     this->order = order;
 }
 

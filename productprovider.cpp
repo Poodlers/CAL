@@ -6,7 +6,7 @@ std::string Provider::getTypeOfNode()  {
 
 Provider::Provider(std::string id):Node(id) {};
 
-Provider::Provider(std::string id, double lat, double lng, std::unordered_map<std::string, int> &stock) : Node(id, lat, lng) {
+Provider::Provider(std::string id, double lat, double lng, double x, double y, std::unordered_map<std::string, int> &stock) : Node(id, lat, lng,x,y) {
     this->stock = stock;
 }
 

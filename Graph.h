@@ -34,7 +34,7 @@ class Vertex {
     bool visited = false;		// auxiliary field
     bool processing = false;	// auxiliary field
 
-    void addEdge(Vertex<T> *dest, double w);
+    void addEdge(int id,Vertex<T> *dest, double w);
 
 public:
     Vertex(T in);
@@ -42,6 +42,7 @@ public:
     double getDist() const;
     Vertex *getPath() const;
     double getEdgeDistance(Vertex<T>* dest);
+    Edge<T> getEdge(Vertex<T>* dest);
 
     bool operator<(Vertex<T> & vertex) const; // // required by MutablePriorityQueue
     friend class Graph<T>;
@@ -57,8 +58,8 @@ Vertex<T>::Vertex(T in): info(in) {}
  * with a given destination vertex (d) and edge weight (w).
  */
 template <class T>
-void Vertex<T>::addEdge(Vertex<T> *d, double w) {
-    adj.push_back(Edge<T>(d, w));
+void Vertex<T>::addEdge(int id, Vertex<T> *d, double w) {
+    adj.push_back(Edge<T>(id, d, w));
 }
 
 template <class T>
@@ -69,6 +70,16 @@ double Vertex<T>::getEdgeDistance(Vertex<T>* dest) {
         }
     }
     return 0;
+}
+
+template <class T>
+Edge<T> Vertex<T>::getEdge(Vertex<T>* dest) {
+    for(Edge<T> edge: this->adj){
+        if(edge.getDest() == dest){
+            return edge;
+        }
+    }
+    return Edge<T>(0, nullptr,0);
 }
 
 
@@ -96,14 +107,19 @@ Vertex<T> *Vertex<T>::getPath() const {
 
 template <class T>
 class Edge {
+    int id;
     Vertex<T> * dest;      // destination vertex
     double weight;         // edge weight
 public:
-    Edge(Vertex<T> *d, double w);
+    Edge(int id,Vertex<T> *d, double w);
 
     Vertex<T> *getDest() const;
 
     double getWeight() const;
+
+    int getId() const;
+
+    void setId(int id);
 
     friend class Graph<T>;
     friend class Vertex<T>;
@@ -111,7 +127,7 @@ public:
 };
 
 template <class T>
-Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w) {}
+Edge<T>::Edge(int id,Vertex<T> *d, double w): id(id),dest(d), weight(w) {}
 
 
 /*************************** Graph  **************************/
@@ -123,7 +139,7 @@ class Graph {
 public:
     Vertex<T> *findVertex(const T &in) const;
     bool addVertex(const T &in);
-    bool addEdge(const T &sourc, const T &dest, double w);
+    bool addEdge(int id,const T &sourc, const T &dest, double w);
     int getNumVertex() const;
     std::vector<Vertex<T> *> getVertexSet() const;
     void setOriginNode(int originNode);
@@ -149,6 +165,16 @@ Vertex<T> *Edge<T>::getDest() const {
 template<class T>
 double Edge<T>::getWeight() const {
     return weight;
+}
+
+template<class T>
+int Edge<T>::getId() const {
+    return id;
+}
+
+template<class T>
+void Edge<T>::setId(int id) {
+    Edge::id = id;
 }
 
 template <class T>
@@ -190,12 +216,12 @@ bool Graph<T>::addVertex(const T &in) {
  * Returns true if successful, and false if the source or destination vertex does not exist.
  */
 template <class T>
-bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
+bool Graph<T>::addEdge(int id,const T &sourc, const T &dest, double w) {
     auto v1 = findVertex(sourc);
     auto v2 = findVertex(dest);
     if (v1 == NULL || v2 == NULL)
         return false;
-    v1->addEdge(v2,w);
+    v1->addEdge(id,v2,w);
     return true;
 }
 
