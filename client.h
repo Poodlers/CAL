@@ -17,6 +17,9 @@ public:
     bool operator==(const Node& node) const;
     bool operator!=(const Node& node) const;
     int getNumOfProducts() const;
+    int getNumOfProduct(const std::string name);
+    bool removeProductAmount(const std::string name, int amount);
+
 };
 
 #endif //CAL_MP1_ALGO_PROD_H

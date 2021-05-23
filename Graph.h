@@ -7,6 +7,8 @@
 #include <vector>
 #include <queue>
 #include <list>
+#include <fstream>
+#include <sstream>
 #include <limits>
 #include <algorithm>
 #include <cmath>
@@ -135,6 +137,8 @@ Edge<T>::Edge(int id,Vertex<T> *d, double w): id(id),dest(d), weight(w) {}
 template <class T>
 class Graph {
     std::vector<Vertex<T> *> vertexSet;    // vertex set
+    std::vector<std::vector<double>> distMin;
+    std::vector<std::vector<Vertex<T>*>> predecessores;
     int originNode = 0;
 public:
     Vertex<T> *findVertex(const T &in) const;
@@ -152,7 +156,7 @@ public:
     std::vector<T> getPath(const T &origin, const T &dest) const;   //TODO...
 
     // Fp06 - all pairs
-    void floydWarshallShortestPath();   //TODO...
+    void floydWarshallShortestPath(std::string city);   //TODO...
     std::vector<T> getfloydWarshallPath(const T &origin, const T &dest) const;   //TODO...
 
 };
@@ -295,7 +299,6 @@ void Graph<T>::dijkstraShortestPath(const T &origin) {
 
 template<class T>
 void Graph<T>::bellmanFordShortestPath(const T &orig) {
-    // TODO implement this
     for(Vertex<T>* vertex: getVertexSet()){
         vertex->dist = 9999;
         vertex->path = NULL;
@@ -306,7 +309,6 @@ void Graph<T>::bellmanFordShortestPath(const T &orig) {
     vertexSource->dist = 0;
     for(Vertex<T>* vertex: getVertexSet()){
         //iterate through every edge V times
-
         for(Vertex<T>* vertex1: getVertexSet()){
             for(Edge<T> edge: vertex1->adj){
                 temp_distance = vertex1->dist + edge.weight;
@@ -349,17 +351,101 @@ std::vector<T> Graph<T>::getPath(const T &origin, const T &dest) const{
 /**************** All Pairs Shortest Path  ***************/
 
 template<class T>
-void Graph<T>::floydWarshallShortestPath() {
-    // TODO implement this
+void Graph<T>::floydWarshallShortestPath(std::string city) {
+    distMin.clear();
+    predecessores.clear();                  // Aloca memória para as Matrizes
+    distMin = std::vector<std::vector<double>>(getNumVertex(), std::vector<double>(getNumVertex(), INF));
+    predecessores = std::vector<std::vector<Vertex<T>*>>(getNumVertex(), std::vector<Vertex<T>*>(getNumVertex(), NULL));
+
+    //check if the file for this city is already existing
+    std::ifstream city_file_read(city + ".txt");
+    std::string line;
+    if(city_file_read.good()){
+        while (std::getline(city_file_read, line)) {
+            std::istringstream iss(line);
+            int l, m;
+            double distMinv;
+            int id;
+            if (!(iss >> l >> m >> distMinv >> id)) { break; } // error
+            distMin[l][m] = distMinv;
+            predecessores[l][m] = this->findVertex(Node(std::to_string(id)));
+
+        }
+        return;
+    }
+
+    for (int i = 0 ; i < getNumVertex() ; i++) {
+        for (int j = 0 ; j < getNumVertex() ; j++) {
+            if (i == j) // Elementos da diagonal da Matriz a 0
+                distMin[i][j] = 0;
+            else {
+                for (auto edge : vertexSet[i]->adj) {
+                    if (edge.dest->getInfo() == vertexSet[j]->info) {
+                        distMin[i][j] = edge.weight;
+                        predecessores[i][j] = vertexSet[i];
+                    }
+                }
+            }
+        }
+    }
+
+    for (int k = 0 ; k < getNumVertex() ; k++) {
+        for (int l = 0 ; l < getNumVertex() ; l++) {
+            for (int m = 0 ; m < getNumVertex() ; m++) {
+                if (distMin[l][m] > distMin[l][k] + distMin[k][m]) {
+                    distMin[l][m] = distMin[l][k] + distMin[k][m];
+                    predecessores[l][m] = predecessores[k][m];
+                }
+            }
+        }
+    }
+
+    //write distMin and predecessores vec to a text file
+    std::ofstream city_file;
+    city_file.open(city + ".txt");
+    std::string id;
+    for (int l = 0 ; l < getNumVertex() ; l++) {
+        for (int m = 0 ; m < getNumVertex() ; m++) {
+            Vertex<Node>* vertex = predecessores[l][m];
+            if(vertex == NULL) id = "0";
+            else id = vertex->info.getId();
+            city_file << l << " " << m << " " << distMin[l][m] << " " << id << "\n";
+
+        }
+    }
+
+    city_file.close();
 
 }
+
 
 template<class T>
 std::vector<T> Graph<T>::getfloydWarshallPath(const T &orig, const T &dest) const{
     std::vector<T> res;
-    // TODO implement this
+    int indexOrigem, indexDestino;
+    for (int i = 0 ; i < getNumVertex() ; i++) {
+        if (vertexSet[i]->info == orig)
+            indexOrigem = i;
+        else if (vertexSet[i]-> info == dest)
+            indexDestino = i;
+    }
+
+    while (predecessores[indexOrigem][indexDestino] != vertexSet[indexOrigem]) {
+        res.emplace(res.begin(), predecessores[indexOrigem][indexDestino]->info);
+        for (int j = 0 ; j < getNumVertex() ; j++) {
+            if (vertexSet[j]->info == predecessores[indexOrigem][indexDestino]->info) {
+                indexDestino = j;
+                break;
+            }
+        }
+    }
+
+    res.push_back(dest);
+    res.insert(res.begin(), orig);
     return res;
+
 }
+
 
 
 #endif /* GRAPH_H_ */

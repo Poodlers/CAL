@@ -176,7 +176,7 @@ bool unloadCar(std::unordered_map<std::string, int> &carStock,Client* client){
 }
 
 pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider *> &providers,
-                                              std::vector<Client*> &clients, Graph<Node> &graph, GraphViewer& gv)  {
+                                              std::vector<Client*> &clients, Graph<Node> &graph, GraphViewer& gv, PATH_FINDING_ALGO algo)  {
 
     fillShoppingList(clientsToDeliverTo, clients);
     vector<vector<int>> viableRoutes;
@@ -256,19 +256,59 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
     double costToTravel;
 
 
-    gv.setCenter(sf::Vector2f(-100, -100));
+    gv.setCenter(sf::Vector2f(0, 0));
     gv.createWindow(1800, 1050);
 
+    ViewerNode& node1 = gv.getNode(stoi(graph.getOriginNode().getId()));
+    string deliveryCarId = "DELIVERY CAR ID: " + this->id;
+    node1.setLabel(deliveryCarId);
 
     for(auto& path1: finalPermsToSearch){
         currPath = {};
         costToTravel = 0;
+        gv.lock();
+
+        //reset the graph for the new trip
+        for(auto& node: gv.getNodes()){
+            Client* client = checkIfClient(clients, node->getId());
+            if(client != nullptr){
+                string compras = "COMPRAS: \n";
+                for(auto& prod: client->getOrder()){
+                    compras = compras + prod.first + " " + to_string(prod.second) + "\n";
+                }
+                node->setLabel(compras);
+                continue;
+            }
+
+            Provider* provider = checkIfProvider(providers, node->getId());
+            if(provider != nullptr){
+                string stock = "STOCK: \n";
+                for(auto& prod: provider->getStock()){
+                    stock = stock + prod.first + " " + to_string(prod.second) + "\n";
+                }
+                node->setLabel(stock);
+                continue;
+            }
+            if(node->getId() != stoi(graph.getOriginNode().getId())) node->setColor(GraphViewer::BLUE);
+
+        }
+
+        for(auto& edge: gv.getEdges()){
+            edge->setColor(GraphViewer::BLACK);
+        }
+
+        gv.unlock();
         for(int i = 0; i < path1.size(); i++){
             currPath.push_back(path1[i]);
             if(i < path1.size() - 1){
                 //get the shortest path between these two vertices
-                graph.dijkstraShortestPath(path1[i]);
-                intermediatePaths = graph.getPath(path1[i], path1[i + 1]);
+                if(algo == DIJSKTRA){
+                    graph.dijkstraShortestPath(path1[i]);
+                    intermediatePaths = graph.getPath(path1[i], path1[i + 1]);
+                }
+                else if(algo == FLOYD_WARSHALL){
+                    intermediatePaths = graph.getfloydWarshallPath(path1[i], path1[i+ 1]);
+                }
                 //add the cost to travel in between these two nodes
                 for(int c = 0; c < intermediatePaths.size(); c++){
                     if(c < intermediatePaths.size() - 1){
@@ -278,15 +318,15 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
 
                         gv.lock();
                         ViewerNode& node0 = gv.getNode(stoi(currVertex->getInfo().getId()));
+                        node0.setColor(GraphViewer::YELLOW);
 
-                        if(currVertex->getInfo().getTypeOfNode() != "Client" && currVertex->getInfo().getTypeOfNode() != "Provider"
-                        && currVertex->getInfo() != graph.getOriginNode())
-                            node0.setColor(GraphViewer::YELLOW);
+                        fix_client_and_provider_color(clients,node0,providers,currVertex->getInfo().getId());
+
 
                         ViewerNode& node1 = gv.getNode(stoi(nextVertex->getInfo().getId()));
-                        if(nextVertex->getInfo().getTypeOfNode() != "Client" && nextVertex->getInfo().getTypeOfNode() != "Provider"
-                        && nextVertex->getInfo() != graph.getOriginNode())
-                            node1.setColor(GraphViewer::PINK);
+                        node1.setColor(GraphViewer::PINK);
+
+                        fix_client_and_provider_color(clients,node1,providers,currVertex->getInfo().getId());
 
                         ViewerEdge& edge = gv.getEdge(currVertex->getEdge(nextVertex).getId());
                         ViewerEdge& edge2 = gv.getEdge(nextVertex->getEdge(currVertex).getId());
@@ -298,9 +338,8 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
                             edge2.setColor(GraphViewer::GREEN);
                         }
 
-
                         gv.unlock();
-                        Sleep(100);
+                        //Sleep(100);
 
                     }
 
@@ -338,4 +377,122 @@ void DeliveryCar::setNodesTravelled(const vector<Node> &nodesTravelled) {
 
 const vector<Node> &DeliveryCar::getNodesTravelled() const {
     return nodesTravelled;
+}
+
+pair<vector<Node>, double> DeliveryCar::getBestPossiblePathNoGV(std::vector<Provider *> &providers,
+                                                                std::vector<Client*> &clients, Graph<Node> &graph, PATH_FINDING_ALGO algo)  {
+
+    fillShoppingList(clientsToDeliverTo, clients);
+    vector<vector<int>> viableRoutes;
+    checkProviderCombinations(providers.size(), viableRoutes,providers);
+    vector<Node> bestRoute;
+
+    vector<int> clientIds = clientsToDeliverTo;
+    vector<vector<Node>> allPathsToSearch;
+
+    vector<Node> Path;
+    vector<Node> provPath;
+    for(auto& provPerm: viableRoutes){
+        Path = {}; //source node of the company
+        for(auto& prov: provPerm) {
+            Path.push_back(*providers[prov]);
+        }
+        for(auto& client: clientIds) {
+
+            Path.push_back(*clients[client]);
+        }
+        allPathsToSearch.push_back(Path);
+    }
+
+    //GENERATE ALL PERMUTATIONS
+    vector<vector<Node>> finalPermsToSearch;
+    vector<int> pathInt;
+    vector<vector<int>> allPossiblePerms;
+    for(auto& pathToSearch: allPathsToSearch){
+        pathInt = {};
+        allPossiblePerms = {};
+        for(int i = 0; i < pathToSearch.size(); i++){
+            pathInt.push_back(stoi(pathToSearch[i].getId()));
+        }
+        findPermutations(pathInt, allPossiblePerms);
+
+        //now, trim all stupid Permutations
+        unordered_map<string,int> stockSoFar; //will represent the stock the car is currently holding
+        bool skipped = false;
+        for(auto iter = allPossiblePerms.begin(); iter != allPossiblePerms.end();){
+            stockSoFar.clear();
+            skipped = false;
+            for(auto& nodeId: *iter){
+                Provider* provider = checkIfProvider(providers,nodeId);
+                Client* client = checkIfClient(clients,nodeId);
+                if(provider != nullptr){ //load the car
+                    loadCar(stockSoFar,provider->getStock());
+                }else if(client != nullptr){ //unload the car
+                    if(!unloadCar(stockSoFar,client)){
+                        iter = allPossiblePerms.erase(iter);
+                        skipped = true;
+                        break;
+                    }
+                }
+            }
+            if(!skipped) iter++;
+        }
+
+        for(auto& possiblePerm: allPossiblePerms){
+            Path = {graph.getOriginNode()};
+            for(auto& nodeId: possiblePerm){
+                Provider* provider = checkIfProvider(providers,nodeId);
+                Client* client = checkIfClient(clients,nodeId);
+                if(provider != nullptr){
+                    Path.push_back(*provider);
+                }else{
+                    Path.push_back(*client);
+                }
+            }
+            finalPermsToSearch.push_back(Path);
+        }
+    }
+
+    vector<Node> intermediatePaths;
+    vector<Node> best;
+    vector<Node> currPath;
+    double bestCost = 99999;
+    double costToTravel;
+
+
+    for(auto& path1: finalPermsToSearch){
+        currPath = {};
+        costToTravel = 0;
+        for(int i = 0; i < path1.size(); i++){
+            currPath.push_back(path1[i]);
+            if(i < path1.size() - 1){
+                //get the shortest path between these two vertices
+                if(algo == DIJSKTRA){
+                    graph.dijkstraShortestPath(path1[i]);
+                    intermediatePaths = graph.getPath(path1[i], path1[i + 1]);
+                }
+                else if(algo == FLOYD_WARSHALL){
+                    intermediatePaths = graph.getfloydWarshallPath(path1[i], path1[i+ 1]);
+                }
+
+                //add the cost to travel in between these two nodes
+                for(int c = 0; c < intermediatePaths.size(); c++){
+                    if(c < intermediatePaths.size() - 1){
+                        Vertex<Node>* nextVertex = graph.findVertex(intermediatePaths[c + 1]);
+                        Vertex<Node>* currVertex = graph.findVertex(intermediatePaths[c]);
+                        costToTravel += currVertex->getEdgeDistance(nextVertex);
+                    }
+
+                }
+            }
+
+        }
+        if(costToTravel < bestCost){
+            bestCost = costToTravel;
+            best = currPath;
+
+        }
+    }
+    return make_pair(best,bestCost);
+
 }

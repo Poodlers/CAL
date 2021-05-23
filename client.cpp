@@ -10,12 +10,35 @@ Client::Client(std::string id, double lat, double lng, double x, double y, std::
     this->order = order;
 }
 
+int Client::getNumOfProduct(const std::string name){
+    std::unordered_map<std::string, int>::const_iterator it = order.find(name);
+    if (it == order.end()){
+        return 0;
+    }
+    else return order[name];
+}
+
+bool Client::removeProductAmount(const std::string name, int amount){
+    int num = getNumOfProduct(name);
+    if (num == 0) {
+        return false;
+    }
+    else if (num <= amount){
+        order.erase(name);
+    }
+    else{
+        order[name] = order[name] - amount;
+    }
+    return true;
+}
+
 bool Client::addOrder(std::string productName, int stock) {
     if(this->order.find(productName) != this->order.end()){
         this->order[productName] = this->order[productName] + stock;
     }else{
         this->order[productName] = stock;
     }
+    return true;
 }
 
 std::unordered_map<std::string, int>& Client::getOrder() {

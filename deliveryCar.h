@@ -2,6 +2,7 @@
 #define CAL_MP1_ALGO_CAR_H
 
 #include "client.h"
+#include "utils.h"
 #include "Graph.h"
 #include "productprovider.h"
 #include "graphviewer.h"
@@ -26,7 +27,8 @@ public:
     void printShoppingList();
     bool checkIfMeetsRequirement(std::unordered_map<std::string, int>& shoppingList);
     void fillShoppingList(std::vector<int> clientIds, std::vector<Client*> clients);
-    std::pair<std::vector<Node>, double> getBestPossiblePath(std::vector<Provider *>& providers, std::vector<Client*>& clients, Graph<Node>& graph, GraphViewer& gv);
+    std::pair<std::vector<Node>, double> getBestPossiblePath(std::vector<Provider *>& providers, std::vector<Client*>& clients, Graph<Node>& graph,
+                                                             GraphViewer& gv, PATH_FINDING_ALGO algo);
     bool check_if_perm_works( std::vector<int> a, std::vector<Provider *> providers, std::vector<std::vector<int>>& viableRoute );
     void setClientsToDeliverTo(std::vector<int> clients);
     void checkProviderCombinations(int set_size, std::vector<std::vector<int>>& providerId, std::vector<Provider *>& providers);
@@ -40,6 +42,10 @@ public:
     void setNodesTravelled(const std::vector<Node> &nodesTravelled);
 
     const std::vector<Node> &getNodesTravelled() const;
+
+
+    pair<vector<Node>, double> getBestPossiblePathNoGV(std::vector<Provider *> &providers,
+                                                                    std::vector<Client*> &clients, Graph<Node> &graph, PATH_FINDING_ALGO algo);
 };
 
 #endif //CAL_MP1_ALGO_CAR_H

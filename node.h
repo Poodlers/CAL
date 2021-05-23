@@ -36,6 +36,8 @@ public:
     double getY() const;
 
     void setY(double y);
+
+    void setId(const std::string &id);
 };
 
 #endif //CAL_MP1_ALGO_BASICNODE_H

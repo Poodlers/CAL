@@ -53,3 +53,7 @@ double Node::getY() const {
 void Node::setY(double y) {
     Node::y = y;
 }
+
+void Node::setId(const std::string &id) {
+    Node::id = id;
+}
