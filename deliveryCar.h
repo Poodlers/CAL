@@ -24,11 +24,15 @@ public:
     bool addDistance(int distance);
     bool addNodeTravelled(Node node);
     bool addToShoppingList(std::string ProductName, int amount);
+    void removeFromClients(int clientToRemove);
     void printShoppingList();
     bool checkIfMeetsRequirement(std::unordered_map<std::string, int>& shoppingList);
     void fillShoppingList(std::vector<int> clientIds, std::vector<Client*> clients);
-    std::pair<std::vector<Node>, double> getBestPossiblePath(std::vector<Provider *>& providers, std::vector<Client*>& clients, Graph<Node>& graph,
+    std::pair<std::vector<Node>, double> getBestPossiblePathBruteForce(std::vector<Provider *>& providers, std::vector<Client*>& clients, Graph<Node>& graph,
                                                              GraphViewer& gv, PATH_FINDING_ALGO algo);
+
+    std::pair<std::vector<Node>, double> getBestPossiblePathNearestNeighbournoGV(std::vector<Provider *>& providers, std::vector<Client*>& clients, Graph<Node>& graph,
+                                                                        PATH_FINDING_ALGO algo);
     bool check_if_perm_works( std::vector<int> a, std::vector<Provider *> providers, std::vector<std::vector<int>>& viableRoute );
     void setClientsToDeliverTo(std::vector<int> clients);
     void checkProviderCombinations(int set_size, std::vector<std::vector<int>>& providerId, std::vector<Provider *>& providers);
@@ -42,9 +46,8 @@ public:
     void setNodesTravelled(const std::vector<Node> &nodesTravelled);
 
     const std::vector<Node> &getNodesTravelled() const;
-
-
-    pair<vector<Node>, double> getBestPossiblePathNoGV(std::vector<Provider *> &providers,
+    void findBest(vector<int> &visitedNodes,vector<int> ids, vector<int>& bestPath, int &bestDistance, int curDistance, vector<Provider*>& providers, vector<Client*>& clients);
+    pair<vector<Node>, double> getBestPossiblePathNoGVBruteForce(std::vector<Provider *> &providers,
                                                                     std::vector<Client*> &clients, Graph<Node> &graph, PATH_FINDING_ALGO algo);
 };
 

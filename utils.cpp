@@ -1,5 +1,4 @@
 #include "utils.h"
-#include <fstream>
 #include <sstream>
 #include <string>
 #include "graphviewer.h"
@@ -291,7 +290,7 @@ void removeFromProviders(vector<Provider*>& providers, vector<Node>& path, unord
 
 }
 
-double calculate_distance_between_two_nodes(Node node1, Node node2){
+double calculate_distance_between_two_nodes(const Node& node1, const Node& node2){
 
     const int R = 6371 * 1000; // metres
     const double s1 = node1.getLat() * M_PI/180; // φ, λ in radians
@@ -307,7 +306,7 @@ double calculate_distance_between_two_nodes(Node node1, Node node2){
     return R * c; // in metres
 }
 
-void fix_client_and_provider_color(std::vector<Client*>& clients, GraphViewer::Node& node, std::vector<Provider*>& providers, std::string id){
+void fix_client_and_provider_color(std::vector<Client*>& clients, GraphViewer::Node& node, std::vector<Provider*>& providers,const std::string& id){
     for(auto& client: clients){
         if(id == client->getId()){
             node.setColor(GraphViewer::RED);
@@ -323,7 +322,7 @@ void fix_client_and_provider_color(std::vector<Client*>& clients, GraphViewer::N
     }
 }
 
-void buildGraphFromTxt(GraphViewer& gv, Graph<Node>& graph, string edgesTxt, string nodesTxt, string nodesXY, vector<Client* >& clients, vector<Provider*>& providers){
+void buildGraphFromTxt(GraphViewer& gv, Graph<Node>& graph,const string& edgesTxt,const string& nodesTxt,const string& nodesXY, vector<Client* >& clients, vector<Provider*>& providers){
 
     ifstream edge_file(edgesTxt);
     ifstream nodes_file(nodesTxt);
@@ -414,7 +413,7 @@ void buildGraphFromTxt(GraphViewer& gv, Graph<Node>& graph, string edgesTxt, str
 
 }
 
-void buildGraphFromTxtNoGV(Graph<Node>& graph, string edgesTxt, string nodesTxt, string nodesXY, vector<Client* >& clients, vector<Provider*>& providers){
+void buildGraphFromTxtNoGV(Graph<Node>& graph,const string& edgesTxt,const string& nodesTxt,const string& nodesXY, vector<Client* >& clients, vector<Provider*>& providers){
     ifstream edge_file(edgesTxt);
     ifstream nodes_file(nodesTxt);
     ifstream nodes_file_xy(nodesXY);
@@ -422,7 +421,7 @@ void buildGraphFromTxtNoGV(Graph<Node>& graph, string edgesTxt, string nodesTxt,
     string line2;
     std::getline(nodes_file, line);
     std::getline(nodes_file_xy, line);
-    int num_of_nodes = stoi(line);
+
     graph.setOriginNode(5);
 
     while (std::getline(nodes_file, line))
@@ -441,7 +440,7 @@ void buildGraphFromTxtNoGV(Graph<Node>& graph, string edgesTxt, string nodesTxt,
             if(*node == *client1){
                 client1->setLat(lat);
                 client1->setLng(lng);
-                node = new Client(to_string(id), lat, lng,x,y, client1->getOrder());
+                node = client1;
                 break;
             }
         }
@@ -449,18 +448,15 @@ void buildGraphFromTxtNoGV(Graph<Node>& graph, string edgesTxt, string nodesTxt,
             if(*node == *provider){
                 provider->setLng(lng);
                 provider->setLat(lat);
-                node = new Provider(to_string(id), lat,lng,x,y,provider->getStock());
+                node = provider;
                 break;
             }
         }
-
         graph.addVertex(*node);
-        //cout << "Lat: " << lat << "   Long: " << lng << endl;
-        // process  (id, lat, lng)
+
     }
 
     std::getline(edge_file, line);
-    int num_of_edges = stoi(line);
     int edgeID = 0;
 
     while (std::getline(edge_file, line))
@@ -469,14 +465,10 @@ void buildGraphFromTxtNoGV(Graph<Node>& graph, string edgesTxt, string nodesTxt,
         int node1, node2;
         char delim;
         if (!(iss >> delim >> node1 >> delim >> node2 >> delim)) { break; } // error
-        Node node3(to_string(node1));
-        Node node4(to_string(node2));
-        Vertex<Node>* v1 = graph.findVertex(node3);
-        Vertex<Node>* v2 = graph.findVertex(node4);
-
+        Vertex<Node>* v1 = graph.findVertex(Node(to_string(node1)));
+        Vertex<Node>* v2 = graph.findVertex(Node(to_string(node2)));
         double distance = calculate_distance_between_two_nodes(v1->getInfo(), v2->getInfo());
         graph.addEdge(edgeID, v1->getInfo(), v2->getInfo(), distance);
-
         edgeID++;
         graph.addEdge(edgeID,v2->getInfo(), v1->getInfo(),distance);
         edgeID++;
@@ -487,7 +479,7 @@ void buildGraphFromTxtNoGV(Graph<Node>& graph, string edgesTxt, string nodesTxt,
 
 void fill_client_and_provider_rand(vector<int> nodeIds, vector<Client* >& clients, vector<Provider *>& providers, int number_clients, int number_providers,vector<string> products){
     vector<int> usedNodes;
-
+    srand(time(NULL));
     for (int i = 0; i<number_clients; i++){
         int node;
         if (usedNodes.size() == nodeIds.size()){
@@ -500,7 +492,7 @@ void fill_client_and_provider_rand(vector<int> nodeIds, vector<Client* >& client
         }
         usedNodes.push_back(nodeIds[node]);
         Client* client = new Client(to_string(nodeIds[node]));
-        int num_prod = rand() % products.size();
+        int num_prod = rand() % ( products.size()- 1) + 1;
         for (int e = 0; e < num_prod; e++){
             int prod = rand() % products.size();
             int ammount = rand() % 9 +1;
@@ -521,7 +513,7 @@ void fill_client_and_provider_rand(vector<int> nodeIds, vector<Client* >& client
         }
         usedNodes.push_back(nodeIds[node]);
         Provider* provider = new Provider(to_string(nodeIds[node]));
-        int num_prod = rand() % products.size();
+        int num_prod = rand() % (products.size() - 1) + 1;
         for (int e = 0; e < num_prod; e++){
             int prod = rand() % products.size();
             int ammount = rand() % 9 +1;
@@ -531,7 +523,7 @@ void fill_client_and_provider_rand(vector<int> nodeIds, vector<Client* >& client
     }
 }
 
-vector<int> getNodeIds(string nodesTxt){
+vector<int> getNodeIds(string& nodesTxt){
     vector<int> nodeIds;
     ifstream nodes_file(nodesTxt);
     string line;

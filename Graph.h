@@ -11,7 +11,10 @@
 #include <sstream>
 #include <limits>
 #include <algorithm>
+#include <map>
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
 #include "MutablePriorityQueue.h"
 
@@ -139,8 +142,10 @@ class Graph {
     std::vector<Vertex<T> *> vertexSet;    // vertex set
     std::vector<std::vector<double>> distMin;
     std::vector<std::vector<Vertex<T>*>> predecessores;
+    std::map< std::pair<std::string , std::string>, std::pair<Vertex<T>*, double> > dijkstraMemoization;
     int originNode = 0;
 public:
+    Graph();
     Vertex<T> *findVertex(const T &in) const;
     bool addVertex(const T &in);
     bool addEdge(int id,const T &sourc, const T &dest, double w);
@@ -155,11 +160,18 @@ public:
     void bellmanFordShortestPath(const T &s);   //TODO...
     std::vector<T> getPath(const T &origin, const T &dest) const;   //TODO...
 
+    std::pair<std::vector<T>, double> getDijsktraPath(const T& origin, const T& dest);
+
     // Fp06 - all pairs
     void floydWarshallShortestPath(std::string city);   //TODO...
-    std::vector<T> getfloydWarshallPath(const T &origin, const T &dest) const;   //TODO...
+    std::pair<std::vector<T>, double> getfloydWarshallPath(const T &origin, const T &dest) const;   //TODO...
 
 };
+
+template <class T>
+Graph<T>::Graph() {
+    dijkstraMemoization = {};
+}
 
 template<class T>
 Vertex<T> *Edge<T>::getDest() const {
@@ -289,6 +301,8 @@ void Graph<T>::dijkstraShortestPath(const T &origin) {
             if(edge.dest->dist > vertexCurrent->dist + edge.weight){
                 edge.dest->dist = vertexCurrent->dist + edge.weight;
                 edge.dest->path = vertexCurrent;
+                auto const result = dijkstraMemoization.insert(std::make_pair(std::make_pair(origin.getId(), edge.dest->info.getId()), std::make_pair(vertexCurrent,edge.dest->dist)));
+                if(not result.second) result.first->second = std::make_pair(vertexCurrent,edge.dest->dist);
                 q.insert(edge.dest);
             }
         }
@@ -347,6 +361,37 @@ std::vector<T> Graph<T>::getPath(const T &origin, const T &dest) const{
 }
 
 
+template <class T>
+std::pair<std::vector<T>, double> Graph<T>::getDijsktraPath(const T &origin, const T &dest)  {
+
+    std::vector<T> res;
+    std::pair<std::string, std::string> key = std::make_pair(origin.getId(), dest.getId());
+    double dist = 0;
+    if(dijkstraMemoization.find(key) == dijkstraMemoization.end() ){
+        dijkstraShortestPath(origin);
+    }
+    int i = 0;
+    Vertex<T>* originVert = findVertex(origin);
+    while (dijkstraMemoization[key].first != originVert ) {
+        res.emplace(res.begin(), dijkstraMemoization[key].first->info);
+        if(i > 0){
+            dist = dist + findVertex(res[i-1])->getEdgeDistance(dijkstraMemoization[key].first);
+        }
+        i++;
+        for (int j = 0 ; j < getNumVertex() ; j++) {
+            if (vertexSet[j]->info == dijkstraMemoization[key].first->info) {
+                key.second = vertexSet[j]->info.getId();
+                break;
+            }
+        }
+    }
+
+    res.push_back(dest);
+    dist = dist + findVertex(res[i - 1])->getEdgeDistance(findVertex(dest));
+    res.insert(res.begin(), origin);
+    return std::make_pair(res,dist);
+}
+
 
 /**************** All Pairs Shortest Path  ***************/
 
@@ -358,19 +403,28 @@ void Graph<T>::floydWarshallShortestPath(std::string city) {
     predecessores = std::vector<std::vector<Vertex<T>*>>(getNumVertex(), std::vector<Vertex<T>*>(getNumVertex(), NULL));
 
     //check if the file for this city is already existing
+    std::string city_file_name = city + ".txt";
     std::ifstream city_file_read(city + ".txt");
     std::string line;
     if(city_file_read.good()){
-        while (std::getline(city_file_read, line)) {
+        std::cout << "Reading " << city + ".txt" << std::endl;
+        FILE * ifile = fopen(city_file_name.c_str(), "r");
+        size_t linesz = 0;
+        char line[600];
+        unsigned int i = 0;
+        while(fgets(line,600,ifile) != NULL){
             std::istringstream iss(line);
             int l, m;
             double distMinv;
             int id;
-            if (!(iss >> l >> m >> distMinv >> id)) { break; } // error
-            distMin[l][m] = distMinv;
-            predecessores[l][m] = this->findVertex(Node(std::to_string(id)));
+            for(int i = 0; i < 20; i++){
+                if (!(iss >> l >> m >> distMinv >> id)) { break; } // error
+                distMin[l][m] = distMinv;
+                predecessores[l][m] = this->findVertex(Node(std::to_string(id)));
+            }
 
         }
+        fclose(ifile);
         return;
     }
 
@@ -389,30 +443,34 @@ void Graph<T>::floydWarshallShortestPath(std::string city) {
         }
     }
 
+    //write distMin and predecessores vec to a text file
+    std::ofstream city_file;
+    city_file.open(city + ".txt");
+    std::string id;
+    int iter_num = 0;
+
     for (int k = 0 ; k < getNumVertex() ; k++) {
         for (int l = 0 ; l < getNumVertex() ; l++) {
             for (int m = 0 ; m < getNumVertex() ; m++) {
                 if (distMin[l][m] > distMin[l][k] + distMin[k][m]) {
                     distMin[l][m] = distMin[l][k] + distMin[k][m];
                     predecessores[l][m] = predecessores[k][m];
+
+                    Vertex<Node>* vertex = predecessores[l][m];
+                    if(vertex == NULL) id = "0";
+                    else id = vertex->info.getId();
+                    city_file << l << " " << m << " " << distMin[l][m] << " " << id << " ";
+                    iter_num++;
+                    if(iter_num % 20 == 0){
+                        city_file << "\n";
+
+                    }
                 }
+
             }
         }
     }
 
-    //write distMin and predecessores vec to a text file
-    std::ofstream city_file;
-    city_file.open(city + ".txt");
-    std::string id;
-    for (int l = 0 ; l < getNumVertex() ; l++) {
-        for (int m = 0 ; m < getNumVertex() ; m++) {
-            Vertex<Node>* vertex = predecessores[l][m];
-            if(vertex == NULL) id = "0";
-            else id = vertex->info.getId();
-            city_file << l << " " << m << " " << distMin[l][m] << " " << id << "\n";
-
-        }
-    }
 
     city_file.close();
 
@@ -420,8 +478,9 @@ void Graph<T>::floydWarshallShortestPath(std::string city) {
 
 
 template<class T>
-std::vector<T> Graph<T>::getfloydWarshallPath(const T &orig, const T &dest) const{
+std::pair<std::vector<T>, double> Graph<T>::getfloydWarshallPath(const T &orig, const T &dest) const{
     std::vector<T> res;
+    double dist;
     int indexOrigem, indexDestino;
     for (int i = 0 ; i < getNumVertex() ; i++) {
         if (vertexSet[i]->info == orig)
@@ -429,9 +488,13 @@ std::vector<T> Graph<T>::getfloydWarshallPath(const T &orig, const T &dest) cons
         else if (vertexSet[i]-> info == dest)
             indexDestino = i;
     }
-
+    int i = 0;
     while (predecessores[indexOrigem][indexDestino] != vertexSet[indexOrigem]) {
         res.emplace(res.begin(), predecessores[indexOrigem][indexDestino]->info);
+        if(i > 0){
+            dist = dist + findVertex(res[i-1])->getEdgeDistance(predecessores[indexOrigem][indexDestino]);
+        }
+        i++;
         for (int j = 0 ; j < getNumVertex() ; j++) {
             if (vertexSet[j]->info == predecessores[indexOrigem][indexDestino]->info) {
                 indexDestino = j;
@@ -441,8 +504,10 @@ std::vector<T> Graph<T>::getfloydWarshallPath(const T &orig, const T &dest) cons
     }
 
     res.push_back(dest);
+
+    dist = dist + findVertex(res[i-1])->getEdgeDistance(findVertex(dest));
     res.insert(res.begin(), orig);
-    return res;
+    return std::make_pair(res,dist);
 
 }
 

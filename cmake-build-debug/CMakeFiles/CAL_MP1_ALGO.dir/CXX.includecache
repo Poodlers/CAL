@@ -717,7 +717,13 @@ limits
 -
 algorithm
 -
+map
+-
 cmath
+-
+cstdio
+-
+cstdlib
 -
 iostream
 -
@@ -727,10 +733,6 @@ C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_M
 C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/MutablePriorityQueue.h
 vector
 -
-
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/client.cpp
-client.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/client.h
 
 C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/client.h
 node.h
@@ -768,35 +770,9 @@ vector
 unordered_map
 -
 
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/main.cpp
-iostream
--
-algorithm
--
-chrono
--
-sstream
--
-productprovider.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/productprovider.h
-Graph.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/Graph.h
-deliveryCar.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/deliveryCar.h
-graphviewer.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/graphviewer.h
-
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/node.cpp
-node.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/node.h
-
 C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/node.h
 string
 -
-
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/productprovider.cpp
-productprovider.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/productprovider.h
 
 C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/productprovider.h
 node.h
@@ -805,18 +781,6 @@ string
 -
 unordered_map
 -
-
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/utils.cpp
-utils.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/utils.h
-fstream
--
-sstream
--
-string
--
-graphviewer.h
-C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/graphviewer.h
 
 C:/Users/radio/OneDrive/Ambiente de Trabalho/PwoGwammingUwU/CLion Projects/CAL_MP1_ALGO/utils.h
 vector

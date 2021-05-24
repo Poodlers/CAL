@@ -35,3 +35,11 @@ bool Provider::operator==(const Node &node) const {
 bool Provider::operator!=(const Node &node) const {
     return this->getId() != node.getId();
 }
+
+bool Provider::isVisited() const {
+    return visited;
+}
+
+void Provider::setVisited(bool visited) {
+    Provider::visited = visited;
+}

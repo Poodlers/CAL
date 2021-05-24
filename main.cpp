@@ -3,6 +3,7 @@
 #include <chrono>
 #include <sstream>
 #include "productprovider.h"
+#include <Windows.h>
 #include "Graph.h"
 #include "deliveryCar.h"
 #include "graphviewer.h"
@@ -38,6 +39,8 @@ void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client* >& clie
     for(DeliveryCar* deliveryCar: deliveryCars){
         bestClientCombo = {};
         bestWeight = -1;
+        cout << "Now evaluating the best route for delivery car: " << deliveryCar->getId() << "\n";
+        Sleep(3000);
         for(int i = 0; i < clientIds.size();i++) {
             clientCombo = {};
             currWeight = 0;
@@ -67,7 +70,7 @@ void planRouteForCars(vector<DeliveryCar*>& deliveryCars, vector<Client* >& clie
         }else{
             for(auto& combo: bestClientCombo){
                 deliveryCar->setClientsToDeliverTo(combo);
-                bestPath = deliveryCar->getBestPossiblePath(providers,clients,graph,gv,algo);
+                bestPath = deliveryCar->getBestPossiblePathBruteForce(providers,clients,graph,gv,algo);
                 if(bestPath.second < bestDistance){
                     trueBestClientCombo = combo;
                     bestDistance = bestPath.second;
@@ -120,6 +123,8 @@ void planRouteForCarsNoGV(vector<DeliveryCar*>& deliveryCars, vector<Client* >& 
     for(DeliveryCar* deliveryCar: deliveryCars){
         bestClientCombo = {};
         bestWeight = -1;
+        cout << "Now evaluating the best route for delivery car: " << deliveryCar->getId() << "\n";
+        Sleep(3000);
         for(int i = 0; i < clientIds.size();i++) {
             clientCombo = {};
             currWeight = 0;
@@ -149,7 +154,7 @@ void planRouteForCarsNoGV(vector<DeliveryCar*>& deliveryCars, vector<Client* >& 
         }else{
             for(auto& combo: bestClientCombo){
                 deliveryCar->setClientsToDeliverTo(combo);
-                bestPath = deliveryCar->getBestPossiblePathNoGV(providers,clients,graph, algo);
+                bestPath = deliveryCar->getBestPossiblePathNearestNeighbournoGV(providers,clients,graph, algo);
                 if(bestPath.second < bestDistance){
                     trueBestClientCombo = combo;
                     bestDistance = bestPath.second;
@@ -196,10 +201,10 @@ void run_with_GV(){
     fill_client_and_provider_rand(getNodeIds(nodesTxt),clients,providers,10,3,products);
 
     //create delivery cars
-    DeliveryCar deliveryCar("1",4);
-    //DeliveryCar deliveryCar1("2", 2);
+    DeliveryCar deliveryCar("1",10);
+    DeliveryCar deliveryCar1("2", 10);
 
-    vector<DeliveryCar *> deliveryCars = {&deliveryCar};
+    vector<DeliveryCar *> deliveryCars = {&deliveryCar, &deliveryCar1};
     auto start1 = chrono::steady_clock::now();
 
     //we do a little sorting
@@ -213,7 +218,10 @@ void run_with_GV(){
 
     GraphViewer gv;
     buildGraphFromTxt(gv,graph,edgestxt, nodesTxt, nodesXY,clients,providers);
-    PATH_FINDING_ALGO algo = FLOYD_WARSHALL;
+
+    gv.setCenter(sf::Vector2f(0, 0));
+    gv.createWindow(1800, 1050);
+    PATH_FINDING_ALGO algo = DIJSKTRA;
     if(algo == FLOYD_WARSHALL){
         graph.floydWarshallShortestPath(city);
 
@@ -237,7 +245,7 @@ void run_with_GV(){
     }
 
     cout << "ran for: " << chrono::duration_cast<chrono::milliseconds >(end1 - start1).count() << " milli seconds \n";
-
+    gv.join();
 }
 
 void run_without_GV(){
@@ -255,7 +263,7 @@ void run_without_GV(){
     //create provider and client information
     vector<string> products = {"A", "B", "C", "D", "E"};
 
-    fill_client_and_provider_rand_providers_guaranteed(getNodeIds(nodesTxt),clients,providers,10,products);
+    fill_client_and_provider_rand(getNodeIds(nodesTxt),clients,providers,3,5,products);
 
     //create delivery cars
     DeliveryCar deliveryCar("1",100000);
@@ -277,10 +285,9 @@ void run_without_GV(){
     });
 
 
-    PATH_FINDING_ALGO algo = FLOYD_WARSHALL;
+    PATH_FINDING_ALGO algo = DIJSKTRA;
     if(algo == FLOYD_WARSHALL){
         graph.floydWarshallShortestPath(city);
-
         //pre processing for floyd warshall algorithm
     }
 

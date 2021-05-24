@@ -24,6 +24,13 @@ bool DeliveryCar::addDistance(int distance) {
     return true;
 }
 
+void DeliveryCar::removeFromClients(int clientToRemove) {
+    this->clientsToDeliverTo.erase(std::remove_if(clientsToDeliverTo.begin(),clientsToDeliverTo.end(),
+                                                  [&clientToRemove](const int& x){
+            return x == clientToRemove;
+    }));
+}
+
 bool DeliveryCar::addToShoppingList(std::string ProductName, int amount) {
     if(this->shoppingList.find(ProductName) != this->shoppingList.end()){
         this->shoppingList[ProductName] = this->shoppingList[ProductName] + amount;
@@ -64,6 +71,53 @@ void DeliveryCar::fillShoppingList(std::vector<int> clientIds, std::vector<Clien
     }
 }
 
+void DeliveryCar::findBest(vector<int> &visitedNodes, vector<int> ids, vector<int> &bestPath, int &bestDistance,
+                           int curDistance, vector<Provider *> &providers, vector<Client *> &clients, std::unordered_map<std::string, int>& carStock){
+
+    for (int i = 0; i < ids.size(); i++){
+        auto itId = find(visitedNodes.begin(),visitedNodes.end(),ids[i]);
+        if (itId == visitedNodes.end()) continue;
+        auto itProv = find(providers.begin(),providers.end(), new Provider(to_string(ids[i])));
+        if (itProv != providers.end()){
+            visitedNodes.push_back(ids[i]);
+            if (visitedNodes.size() > 1){
+                //check distance between this node and the last
+                
+            }
+
+            //add products to map
+            this->loadCar(carStock,(*itProv)->getStock());
+            findBest(visitedNodes,ids,bestPath,bestDistance,curDistance,providers,clients);
+            visitedNodes.pop_back();
+        }
+        else{
+            auto it = find(clients.begin(),clients.end(), new Client(to_string(ids[i])));
+            if (visitedNodes.empty()) continue;
+            else{
+                //check distance between this node and the last
+                //remove products from map
+                //if you can they exist to remove proceed to next:
+                visitedNodes.push_back(ids[i]);
+                findBest(visitedNodes,ids,bestPath,bestDistance,curDistance,providers,clients);
+                visitedNodes.pop_back();
+                //else
+                continue;
+            }
+        }
+    }
+    // if the thing leaves the loop it's because there is either nothing more to use or it hit a dead end
+    // verify distance between this path and last best and return so that it can do more permutations
+    if (visitedNodes.size() != ids.size()) return; //due to pre-selection it always chooses the min number of nodes it can visit
+    if (bestPath.empty()){
+        bestPath = visitedNodes;
+        curDistance = bestDistance;
+    }
+    else if (curDistance < bestDistance){
+        bestPath = visitedNodes;
+        curDistance = bestDistance;
+    }
+
+}
 
 
 bool DeliveryCar::check_if_perm_works(std::vector<int> a, std::vector<Provider *> providers,
@@ -146,6 +200,9 @@ Client* checkIfClient(std::vector<Client*> &clients, int id){
     return nullptr;
 }
 
+
+
+
 void DeliveryCar::loadCar(std::unordered_map<std::string, int> &carStock,
                           std::unordered_map<std::string, int> &stockToLoad) {
     for(auto& prod: stockToLoad){
@@ -153,13 +210,32 @@ void DeliveryCar::loadCar(std::unordered_map<std::string, int> &carStock,
             continue; //this product is not in the shoppingList for this car and can be ignored
         }else{
             if(stockToLoad[prod.first] >= shoppingList[prod.first]){ //provider has more than what the car needs
-                carStock[prod.first] = shoppingList[prod.first]; //load the required for what the car needs
+                carStock[prod.first] = carStock[prod.first] + shoppingList[prod.first]; //load the required for what the car needs
+                shoppingList.erase(prod.first);
             }else{
-                carStock[prod.first] = stockToLoad[prod.first]; // load all this provider can afford to give
+                carStock[prod.first] = carStock[prod.first] + stockToLoad[prod.first]; // load all this provider can afford to give
+                shoppingList[prod.first] = shoppingList[prod.first] - stockToLoad[prod.first];
             }
         }
     }
 }
+
+void unloadMerch(std::unordered_map<std::string, int> &carStock,Client* client){
+    unordered_map<string,int> shoppingListClient = client->getOrder();
+    for(auto& prod: shoppingListClient){
+        if(carStock.find(prod.first) != carStock.end()){ //this product does not even exist in the car stock
+            if(carStock[prod.first] > prod.second){
+                carStock[prod.first] = carStock[prod.first] - prod.second;
+            }else{
+                carStock.erase(prod.first);
+            }
+
+        }
+
+    }
+
+}
+
 
 bool unloadCar(std::unordered_map<std::string, int> &carStock,Client* client){
     unordered_map<string,int> shoppingListClient = client->getOrder();
@@ -175,7 +251,7 @@ bool unloadCar(std::unordered_map<std::string, int> &carStock,Client* client){
     return true;
 }
 
-pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider *> &providers,
+pair<vector<Node>, double> DeliveryCar::getBestPossiblePathBruteForce(std::vector<Provider *> &providers,
                                               std::vector<Client*> &clients, Graph<Node> &graph, GraphViewer& gv, PATH_FINDING_ALGO algo)  {
 
     fillShoppingList(clientsToDeliverTo, clients);
@@ -194,7 +270,6 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
             Path.push_back(*providers[prov]);
         }
         for(auto& client: clientIds) {
-
             Path.push_back(*clients[client]);
         }
         allPathsToSearch.push_back(Path);
@@ -245,19 +320,17 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
                     Path.push_back(*client);
                 }
             }
+            Path.push_back(graph.getOriginNode());
             finalPermsToSearch.push_back(Path);
         }
     }
 
-    vector<Node> intermediatePaths;
+    std::pair<vector<Node>, double> intermediatePaths;
     vector<Node> best;
     vector<Node> currPath;
     double bestCost = 99999;
     double costToTravel;
 
-
-    gv.setCenter(sf::Vector2f(0, 0));
-    gv.createWindow(1800, 1050);
 
     ViewerNode& node1 = gv.getNode(stoi(graph.getOriginNode().getId()));
     string deliveryCarId = "DELIVERY CAR ID: " + this->id;
@@ -303,17 +376,18 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
             if(i < path1.size() - 1){
                 //get the shortest path between these two vertices
                 if(algo == DIJSKTRA){
-                    graph.dijkstraShortestPath(path1[i]);
-                    intermediatePaths = graph.getPath(path1[i], path1[i + 1]);
+                    intermediatePaths = graph.getDijsktraPath(path1[i], path1[i + 1]);
+                    costToTravel = intermediatePaths.second;
                 }
                 else if(algo == FLOYD_WARSHALL){
                     intermediatePaths = graph.getfloydWarshallPath(path1[i], path1[i+ 1]);
+                    costToTravel = intermediatePaths.second;
                 }
                 //add the cost to travel in between these two nodes
-                for(int c = 0; c < intermediatePaths.size(); c++){
-                    if(c < intermediatePaths.size() - 1){
-                        Vertex<Node>* nextVertex = graph.findVertex(intermediatePaths[c + 1]);
-                        Vertex<Node>* currVertex = graph.findVertex(intermediatePaths[c]);
+                for(int c = 0; c < intermediatePaths.first.size(); c++){
+                    if(c < intermediatePaths.first.size() - 1){
+                        Vertex<Node>* nextVertex = graph.findVertex(intermediatePaths.first[c + 1]);
+                        Vertex<Node>* currVertex = graph.findVertex(intermediatePaths.first[c]);
                         costToTravel += currVertex->getEdgeDistance(nextVertex);
 
                         gv.lock();
@@ -354,10 +428,135 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePath(std::vector<Provider
 
         }
     }
-    gv.join();
     return make_pair(best,bestCost);
 
 }
+
+bool checkIfClientIsDeliverable(Client* client, std::unordered_map<std::string, int> currCarryingCar ){
+    for(auto& product: client->getOrder()){
+        if(currCarryingCar.find(product.first) != currCarryingCar.end()){
+            if(currCarryingCar[product.first] - product.second >= 0){
+                currCarryingCar[product.first] -= product.second;
+            }else{
+                return false;
+            }
+        }else{ //the requested product doesnt even exist in the providers
+            return false;
+        }
+    }
+    return true;
+}
+
+bool checkIfProviderIsRelevant(Provider* provider, std::unordered_map<std::string, int> shoppingList ){
+    if(provider->isVisited()) return false;
+    for(auto& product: provider->getStock()){
+        if(shoppingList.find(product.first) != shoppingList.end()){
+            return true;
+        }
+    }
+    return false;
+}
+
+std::pair<std::vector<Node>, double> DeliveryCar::getBestPossiblePathNearestNeighbournoGV(
+        std::vector<Provider *> &providers, std::vector<Client *> &clients, Graph<Node> &graph,
+        PATH_FINDING_ALGO algo) {
+    //get all the deliverable clients
+    for(Provider* provider: providers){
+        provider->setVisited(false);
+    }
+    fillShoppingList(clientsToDeliverTo,clients);
+    bool isClientDeliverableNext = false;
+    int deliverableClientID = 0;
+    Provider* nearestProvider;
+
+    int currNode = 0;
+    double totalCost = 0;
+    double closestDistance;
+
+    std::vector<Node> finalPath;
+    int amountOfDeliverableClients = 0;
+
+    finalPath.push_back(graph.getOriginNode());
+    std::unordered_map<std::string, int> currCarryingCar;
+    std::pair<std::vector<Node>, double> intermediatePaths;
+    double costToTravel = 0;
+
+    while(!clientsToDeliverTo.empty()) {
+        amountOfDeliverableClients = 0;
+        closestDistance = 99999999;
+        for (int clientID: clientsToDeliverTo) {
+            costToTravel = 0;
+            if (checkIfClientIsDeliverable(clients[clientID], currCarryingCar)) {
+                amountOfDeliverableClients++;
+                //check the distance between currentNode and client
+                if (algo == DIJSKTRA) {
+                    intermediatePaths = graph.getDijsktraPath(finalPath[currNode], *clients[clientID]);
+
+                } else if (algo == FLOYD_WARSHALL) {
+                    intermediatePaths = graph.getfloydWarshallPath(finalPath[currNode], *clients[clientID]);
+                }
+                costToTravel = intermediatePaths.second;
+                //add the cost to travel in between these two nodes
+                if (costToTravel < closestDistance) {
+                    closestDistance = costToTravel;
+                    isClientDeliverableNext = true;
+                    deliverableClientID = clientID;
+                }
+
+            }
+        }
+
+        //if all clients are already deliverable theres no point in visiting another provider
+        if (amountOfDeliverableClients != clientsToDeliverTo.size()) {
+            //get the closest provider that has products relevant to the cause
+            for (Provider *provider: providers) {
+                costToTravel = 0;
+                if (checkIfProviderIsRelevant(provider, shoppingList)) {
+                    //check the distance between currentNode and client
+                    if (algo == DIJSKTRA) {
+                        intermediatePaths = graph.getDijsktraPath(finalPath[currNode], *provider);
+
+                    } else if (algo == FLOYD_WARSHALL) {
+                        intermediatePaths = graph.getfloydWarshallPath(finalPath[currNode], *provider);
+                    }
+                    costToTravel = intermediatePaths.second;
+                    //add the cost to travel in between these two nodes
+                    if (costToTravel < closestDistance) {
+                        closestDistance = costToTravel;
+                        isClientDeliverableNext = false;
+                        nearestProvider = provider;
+                    }
+
+                }
+            }
+        }
+
+        if (!isClientDeliverableNext) {
+            loadCar(currCarryingCar, nearestProvider->getStock());
+            finalPath.push_back(*nearestProvider);
+            nearestProvider->setVisited(true);
+
+        } else {
+            removeFromClients(deliverableClientID);
+            finalPath.push_back(*clients[deliverableClientID]);
+            unloadMerch(currCarryingCar,clients[deliverableClientID]);
+        }
+        currNode++;
+        totalCost += closestDistance;
+    }
+    finalPath.push_back(graph.getOriginNode());
+    if (algo == DIJSKTRA) {
+        intermediatePaths = graph.getDijsktraPath(finalPath[currNode], graph.getOriginNode());
+    } else if (algo == FLOYD_WARSHALL) {
+        intermediatePaths = graph.getfloydWarshallPath(finalPath[currNode], graph.getOriginNode());
+    }
+    totalCost += intermediatePaths.second;
+
+    return make_pair(finalPath,totalCost);
+
+
+}
+
 
 int DeliveryCar::getCapacity() const {
     return capacity;
@@ -379,7 +578,7 @@ const vector<Node> &DeliveryCar::getNodesTravelled() const {
     return nodesTravelled;
 }
 
-pair<vector<Node>, double> DeliveryCar::getBestPossiblePathNoGV(std::vector<Provider *> &providers,
+pair<vector<Node>, double> DeliveryCar::getBestPossiblePathNoGVBruteForce(std::vector<Provider *> &providers,
                                                                 std::vector<Client*> &clients, Graph<Node> &graph, PATH_FINDING_ALGO algo)  {
 
     fillShoppingList(clientsToDeliverTo, clients);
@@ -449,14 +648,15 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePathNoGV(std::vector<Prov
                     Path.push_back(*client);
                 }
             }
+            Path.push_back(graph.getOriginNode());
             finalPermsToSearch.push_back(Path);
         }
     }
 
-    vector<Node> intermediatePaths;
+    std::pair<vector<Node>, double> intermediatePaths;
     vector<Node> best;
     vector<Node> currPath;
-    double bestCost = 99999;
+    double bestCost = 9999999;
     double costToTravel;
 
 
@@ -468,22 +668,13 @@ pair<vector<Node>, double> DeliveryCar::getBestPossiblePathNoGV(std::vector<Prov
             if(i < path1.size() - 1){
                 //get the shortest path between these two vertices
                 if(algo == DIJSKTRA){
-                    graph.dijkstraShortestPath(path1[i]);
-                    intermediatePaths = graph.getPath(path1[i], path1[i + 1]);
+                    intermediatePaths = graph.getDijsktraPath(path1[i], path1[i + 1]);
                 }
                 else if(algo == FLOYD_WARSHALL){
                     intermediatePaths = graph.getfloydWarshallPath(path1[i], path1[i+ 1]);
                 }
+                costToTravel = intermediatePaths.second;
 
-                //add the cost to travel in between these two nodes
-                for(int c = 0; c < intermediatePaths.size(); c++){
-                    if(c < intermediatePaths.size() - 1){
-                        Vertex<Node>* nextVertex = graph.findVertex(intermediatePaths[c + 1]);
-                        Vertex<Node>* currVertex = graph.findVertex(intermediatePaths[c]);
-                        costToTravel += currVertex->getEdgeDistance(nextVertex);
-                    }
-
-                }
             }
 
         }
